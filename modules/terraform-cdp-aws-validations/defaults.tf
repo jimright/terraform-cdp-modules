@@ -12,27 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-provider "aws" {
-  profile = var.aws_profile
-  region  = var.aws_region
-}
+locals {
+  
+  clone_location = coalesce(var.clone_location, "cdp-onboarding-companion")
 
-module "ex01_basic" {
-  source = "../.."
-
-  aws_region = var.aws_region
-
-}
-
-
-output "vpcs_per_region_quota" {
-  value = module.ex01_basic.aws_vpc_quota.value
-}
-
-output "vpcs_per_region_usage" {
-  value = module.ex01_basic.aws_vpc_usage
-}
-
-output "cdp_quota_validation_checks" {
-  value = module.ex01_basic.cdp_quota_validation_checks
 }

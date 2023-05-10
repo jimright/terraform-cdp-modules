@@ -12,27 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-provider "aws" {
-  profile = var.aws_profile
-  region  = var.aws_region
-}
+resource "null_resource" "git_clone" {
+  provisioner "local-exec" {
+    command = "git clone --branch feature/json_output https://github.infra.cloudera.com/jenright/cdp-onboarding-companion.git ${local.clone_location}"
+  }
 
-module "ex01_basic" {
-  source = "../.."
-
-  aws_region = var.aws_region
-
-}
-
-
-output "vpcs_per_region_quota" {
-  value = module.ex01_basic.aws_vpc_quota.value
-}
-
-output "vpcs_per_region_usage" {
-  value = module.ex01_basic.aws_vpc_usage
-}
-
-output "cdp_quota_validation_checks" {
-  value = module.ex01_basic.cdp_quota_validation_checks
+  # TODO: Handle removal of this repo on destroy
 }

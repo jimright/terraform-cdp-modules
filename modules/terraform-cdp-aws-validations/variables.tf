@@ -20,6 +20,13 @@ variable "aws_region" {
   default = null
 }
 
+variable "clone_location" {
+  type        = string
+  description = "Location where CDP Onboarding Companion repo will be cloned"
+
+  default = null
+}
+
 # ------- Quota validation requirements -------
 variable "vpc_count_required" {
   type = number

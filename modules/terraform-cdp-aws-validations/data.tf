@@ -18,7 +18,7 @@ data "aws_servicequotas_service_quota" "vpcs_per_region" {
 
   lifecycle {
     postcondition {
-      condition = self.value < data.external.aws_vpc_usage_check.result.created_vpcs_per_region
+      condition = self.value > data.external.aws_vpc_usage_check.result.created_vpcs_per_region
       error_message = "${var.vpc_count_required} VPCs are required for this CDP deployment"
 
     }
@@ -33,9 +33,26 @@ data "external" "aws_vpc_usage_check" {
   }
 }
 
+
 # NOTE: WIP, alternative to above without bash wrapper
 # data "external" "aws_vpc_usage_check" {
 
 #    program = ["sh", "-c", "aws", "ec2", "describe-vpcs", "--region", "${var.aws_region}", "| jq -r '.Vpcs | length"]
 # #   aws ec2 describe-vpcs --region $aws_region | jq '.Vpcs | length
 # }
+
+# NOTE: Using Onboarding Companion
+data "external" "quota_validation_checks" {
+
+  program = ["bash", "cdp-onboarding-companion/src/aws/02-quota.sh"]
+  # query = {
+  #   region = var.aws_region
+  # }
+
+    lifecycle {
+    postcondition {
+      condition = (self.result.vpc_per_region == "PASS" && self.result.igw_per_region == "PASS" )
+      error_message = "Quota Validation Check failed. See output for more details."
+    }
+  }
+}

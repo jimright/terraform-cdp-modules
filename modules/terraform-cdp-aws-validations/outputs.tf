@@ -24,3 +24,9 @@ output "aws_vpc_usage" {
 
   description = "VPC Per Region Usage"
 }
+
+output "cdp_quota_validation_checks" {
+  value = data.external.quota_validation_checks.result
+
+  description = "Quota Validation" 
+}
