@@ -18,6 +18,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.0"
     }
+    cdp = {
+      source  = "cloudera/cdp"
+      version = "0.1.0"
+    }
     http = {
       source  = "hashicorp/http"
       version = "3.2.1"

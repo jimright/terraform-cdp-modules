@@ -14,7 +14,7 @@
 
 # ------- Global settings -------
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "Tags applied to provisioned resources"
 
 }

@@ -14,6 +14,10 @@
 
 terraform {
   required_providers {
+    cdp = {
+      source  = "cloudera/cdp"
+      version = "0.1.0"
+    }
     local = {
       source  = "hashicorp/local"
       version = "2.2.3"
