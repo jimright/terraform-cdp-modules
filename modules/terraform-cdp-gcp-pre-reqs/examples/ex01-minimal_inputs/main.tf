@@ -12,13 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-terraform {
-  required_providers {
-    cdp = {
-      source  = "cloudera/cdp"
-      version = "0.3.0-pre"
-    }
-  }
+provider "google" {
+  project = var.gcp_project
+  region  = var.gcp_region
+}
 
-  required_version = ">= 1.3.0"
+module "ex01_minimal_inputs" {
+  source = "../.."
+
+  env_prefix   = var.env_prefix
+  gcp_region = var.gcp_region
+
+  # public_key_text = var.public_key_text
+
+  # deployment_template = var.deployment_template
+
+  ingress_extra_cidrs_and_ports = var.ingress_extra_cidrs_and_ports
+
 }

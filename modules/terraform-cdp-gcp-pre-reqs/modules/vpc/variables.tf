@@ -12,13 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-terraform {
-  required_providers {
-    cdp = {
-      source  = "cloudera/cdp"
-      version = "0.3.0-pre"
-    }
-  }
+variable "vpc_name" {
+  type        = string
+  description = "VPC Network name"
 
-  required_version = ">= 1.3.0"
+}
+
+variable "vpc_cidr" {
+  type        = string
+  description = "VPC Network CIDR Block"
+
+}
+
+variable "subnet_count" {
+  type        = number
+  description = "Number of Subnets Required"
+
+}
+
+variable "env_prefix" {
+  type        = string
+  description = "Shorthand name for the environment. Used in resource descriptions"
 }

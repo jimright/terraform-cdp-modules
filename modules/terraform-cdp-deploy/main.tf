@@ -115,3 +115,67 @@ module "cdp_on_azure" {
   log_identity_id           = var.azure_log_identity_id
   raz_identity_id           = var.azure_raz_identity_id
 }
+
+# ------- Call sub-module for GCP Deployment -------
+module "cdp_on_gcp" {
+  count = (var.infra_type == "gcp") ? 1 : 0
+
+  source = "./modules/gcp"
+
+  # tags = local.env_tags # NOTE: Waiting on provider fix
+
+  environment_name              = local.environment_name
+  datalake_name                 = local.datalake_name
+  cdp_xacccount_credential_name = local.cdp_xacccount_credential_name
+  cdp_admin_group_name          = local.cdp_admin_group_name
+  cdp_user_group_name           = local.cdp_user_group_name
+
+  firewall_default_id = var.gcp_firewall_default_id
+  firewall_knox_id    = var.gcp_firewall_knox_id
+
+  # datalake_scale         = local.datalake_scale
+  # datalake_version       = var.datalake_version
+  enable_ccm_tunnel      = var.enable_ccm_tunnel
+
+  freeipa_instances      = var.freeipa_instances
+  freeipa_instance_type = var.freeipa_instance_type
+  freeipa_recipes       = var.freeipa_recipes
+
+  workload_analytics     = var.workload_analytics
+  endpoint_access_scheme = local.endpoint_access_scheme
+
+  environment_polling_timeout = var.environment_polling_timeout
+  # datalake_polling_timeout    = var.datalake_polling_timeout
+
+  # # TODO: Will be re-introducted once provider supports other regions
+  # # cdp_control_plane_region = var.cdp_control_plane_region
+
+  # use_single_resource_group = var.use_single_resource_group
+  # TODO: Dependent on deployment template
+  # use_public_ips            = local.use_public_ips
+  use_public_ips            = true
+
+  project_id = var.gcp_project_id
+
+  region                   = var.region
+  network_name = var.gcp_network_name
+  cdp_subnet_names         = var.gcp_cdp_subnet_names
+  public_key_text          = var.public_key_text
+
+  data_storage_location   = var.data_storage_location
+  log_storage_location    = var.log_storage_location
+  backup_storage_location = var.backup_storage_location
+
+  xaccount_service_account_private_key  = var.gcp_xaccount_service_account_private_key
+
+  proxy_config_name   = var.proxy_config_name
+
+  encryption_key = var.gcp_encryption_key
+  # idbroker_identity_id      = var.azure_idbroker_identity_id
+  # datalakeadmin_identity_id = var.azure_datalakeadmin_identity_id
+  # ranger_audit_identity_id  = var.azure_ranger_audit_identity_id
+  log_service_account_email           = var.gcp_log_service_account_email
+  # raz_identity_id           = var.azure_raz_identity_id
+
+  report_deployment_logs = var.gcp_report_deployment_logs
+}
