@@ -133,8 +133,8 @@ module "cdp_on_gcp" {
   firewall_default_id = var.gcp_firewall_default_id
   firewall_knox_id    = var.gcp_firewall_knox_id
 
-  # datalake_scale         = local.datalake_scale
-  # datalake_version       = var.datalake_version
+  datalake_scale         = local.datalake_scale
+  datalake_version       = var.datalake_version
   enable_ccm_tunnel      = var.enable_ccm_tunnel
 
   freeipa_instances      = var.freeipa_instances
@@ -145,7 +145,7 @@ module "cdp_on_gcp" {
   endpoint_access_scheme = local.endpoint_access_scheme
 
   environment_polling_timeout = var.environment_polling_timeout
-  # datalake_polling_timeout    = var.datalake_polling_timeout
+  datalake_polling_timeout    = var.datalake_polling_timeout
 
   # # TODO: Will be re-introducted once provider supports other regions
   # # cdp_control_plane_region = var.cdp_control_plane_region
@@ -171,11 +171,16 @@ module "cdp_on_gcp" {
   proxy_config_name   = var.proxy_config_name
 
   encryption_key = var.gcp_encryption_key
-  # idbroker_identity_id      = var.azure_idbroker_identity_id
-  # datalakeadmin_identity_id = var.azure_datalakeadmin_identity_id
-  # ranger_audit_identity_id  = var.azure_ranger_audit_identity_id
+  idbroker_service_account_email      = var.gcp_idbroker_service_account_email
+  ranger_audit_service_account_email = var.gcp_ranger_audit_service_account_email
+  datalake_admin_service_account_email = var.gcp_datalake_admin_service_account_email
   log_service_account_email           = var.gcp_log_service_account_email
-  # raz_identity_id           = var.azure_raz_identity_id
 
   report_deployment_logs = var.gcp_report_deployment_logs
+  
+  datalake_custom_instance_groups = var.datalake_custom_instance_groups
+  datalake_image        = var.datalake_image
+  datalake_java_version = var.datalake_java_version
+  datalake_recipes                = var.datalake_recipes
+
 }

@@ -65,11 +65,10 @@ module "cdp_deploy" {
 
   gcp_xaccount_service_account_private_key = module.cdp_gcp_prereqs.gcp_xaccount_sa_private_key
 
-  # azure_idbroker_identity_id      = module.cdp_azure_prereqs.azure_idbroker_identity_id
-  # azure_datalakeadmin_identity_id = module.cdp_azure_prereqs.azure_datalakeadmin_identity_id
-  # azure_ranger_audit_identity_id  = module.cdp_azure_prereqs.azure_ranger_audit_identity_id
+  gcp_idbroker_service_account_email      = module.cdp_gcp_prereqs.gcp_idbroker_service_account_email
+  gcp_datalake_admin_service_account_email     = module.cdp_gcp_prereqs.gcp_datalake_admin_service_account_email
+  gcp_ranger_audit_service_account_email     = module.cdp_gcp_prereqs.gcp_ranger_audit_service_account_email
   gcp_log_service_account_email     = module.cdp_gcp_prereqs.gcp_log_service_account_email
-  # azure_raz_identity_id           = module.cdp_azure_prereqs.azure_raz_identity_id
 
   depends_on = [
     module.cdp_gcp_prereqs

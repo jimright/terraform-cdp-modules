@@ -16,7 +16,7 @@
 resource "cdp_environments_gcp_credential" "cdp_cred" {
   credential_name = var.cdp_xacccount_credential_name
   credential_key  = var.xaccount_service_account_private_key
-  description     = "AWS Cross Account Credential for AWS env ${var.environment_name}"
+  description     = "CDP Credential for GCP env ${var.environment_name}"
 }
 
 # ------- CDP Environment -------
@@ -74,20 +74,89 @@ resource "cdp_environments_gcp_environment" "cdp_env" {
   ]
 }
 
-# ------- CDP Admin Group -------
-# Create group
+# # ------- CDP Admin Group -------
+# # Create group
+# resource "cdp_iam_group" "cdp_admin_group" {
+#   group_name                    = var.cdp_admin_group_name
+#   sync_membership_on_user_login = false
+# }
 
-# TODO: Assign roles and resource roles to the group
+# # TODO: Assign roles and resource roles to the group
 
-# TODO: Assign users to the group
+# # TODO: Assign users to the group
 
-# ------- CDP User Group -------
-# Create group
+# # ------- CDP User Group -------
+# # Create group
+# resource "cdp_iam_group" "cdp_user_group" {
+#   group_name                    = var.cdp_user_group_name
+#   sync_membership_on_user_login = false
+# }
 
-# TODO: Assign roles and resource roles to the group
+# # TODO: Assign roles and resource roles to the group
 
-# TODO: Assign users to the group
+# # TODO: Assign users to the group
 
-# ------- IdBroker Mappings -------
+# # ------- IdBroker Mappings -------
+# resource "cdp_environments_id_broker_mappings" "cdp_idbroker" {
+#   # environment_name = cdp_environments_gcp_environment.cdp_env.environment_name
+#   # environment_crn  = cdp_environments_gcp_environment.cdp_env.crn
+#   environment_name = "jetf-gc-cdp-env"
+#   environment_crn  = "crn:cdp:environments:us-west-1:558bc1d2-8867-4357-8524-311d51259233:environment:f7ac7290-a180-4173-9ccd-df94f57a80a1"
 
-# ------- CDP Datalake -------
+#   ranger_audit_role                   = var.ranger_audit_service_account_email
+#   # ranger_audit_role                   = "jetf-gc-rgraudit-sa@gcp-se-cdp-sandbox-env.iam.gserviceaccount.com"
+  
+#   data_access_role                    = var.datalake_admin_service_account_email
+#   # data_access_role                    = "jetf-gc-dladmin-sa@gcp-se-cdp-sandbox-env.iam.gserviceaccount.com"
+
+#   mappings = [{
+#     accessor_crn = cdp_iam_group.cdp_admin_group.crn
+#     role         = var.datalake_admin_service_account_email
+#     # role         = "jetf-gc-dladmin-sa@gcp-se-cdp-sandbox-env.iam.gserviceaccount.com"
+#     },
+#     {
+#       accessor_crn = cdp_iam_group.cdp_user_group.crn
+#       role         = var.datalake_admin_service_account_email
+#       # role         = "jetf-gc-dladmin-sa@gcp-se-cdp-sandbox-env.iam.gserviceaccount.com"
+#     }
+#   ]
+
+#   # depends_on = [
+#   #   cdp_environments_gcp_environment.cdp_env
+#   # ]
+# }
+
+# # ------- CDP Datalake -------
+# resource "cdp_datalake_gcp_datalake" "cdp_datalake" {
+#   datalake_name    = var.datalake_name
+#   # environment_name = cdp_environments_gcp_environment.cdp_env.environment_name
+#   environment_name = "jetf-gc-cdp-env"
+
+#   cloud_provider_configuration = {
+#     service_account_email = var.idbroker_service_account_email
+#     storage_location = var.data_storage_location
+#   }
+
+#   runtime           = var.datalake_version == "latest" ? null : var.datalake_version
+#   scale             = var.datalake_scale
+#   # enable_ranger_raz = var.enable_raz # TODO: Test this
+#   # multi_az          = var.multiaz # TODO: Test this
+
+#   custom_instance_groups = var.datalake_custom_instance_groups
+#   image                  = var.datalake_image
+#   java_version           = var.datalake_java_version
+#   recipes                = var.datalake_recipes
+
+#   polling_options = {
+#     polling_timeout = var.datalake_polling_timeout
+#   }
+
+#   # tags = var.tags # NOTE: Waiting on provider fix
+
+#   depends_on = [
+#     cdp_environments_gcp_credential.cdp_cred,
+#     # cdp_environments_gcp_environment.cdp_env,
+#     cdp_environments_id_broker_mappings.cdp_idbroker
+#   ]
+# }
+

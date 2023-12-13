@@ -81,23 +81,23 @@ output "gcp_xaccount_sa_private_key" {
   description = "Base64 encoded private key of the GCP Cross Account Service Account Key"
 }
 
-# output "azure_idbroker_identity_id" {
-#   value = azurerm_user_assigned_identity.cdp_idbroker.id
+output "gcp_idbroker_service_account_email" {
+  value = google_service_account.cdp_idbroker_sa.email
 
-#   description = "IDBroker Managed Identity ID"
-# }
+  description = "Email id of the service account for IDBroker"
+}
 
-# output "azure_datalakeadmin_identity_id" {
-#   value = azurerm_user_assigned_identity.cdp_datalake_admin.id
+output "gcp_datalake_admin_service_account_email" {
+  value = google_service_account.cdp_datalake_admin_sa.email
 
-#   description = "Datalake Admin Managed Identity ID"
-# }
+  description = "Email id of the service account for Datalake Admin"
+}
 
-# output "azure_ranger_audit_identity_id" {
-#   value = azurerm_user_assigned_identity.cdp_ranger_audit_data_access.id
+output "gcp_ranger_audit_service_account_email" {
+  value = google_service_account.cdp_ranger_audit_sa.email
 
-#   description = "Ranger Audit Managed Identity ID"
-# }
+  description = "Email id of the service account for Ranger Audit"
+}
 
 output "gcp_log_service_account_email" {
   value = google_service_account.cdp_log_sa.email
@@ -105,9 +105,3 @@ output "gcp_log_service_account_email" {
   description = "Email id of the service account for Log Storage"
 
 }
-
-# output "azure_raz_identity_id" {
-#   value = (var.enable_raz) ? azurerm_user_assigned_identity.cdp_raz[0].id : ""
-
-#   description = "RAZ Managed Identity ID. Value returned if RAZ is enabled"
-# }

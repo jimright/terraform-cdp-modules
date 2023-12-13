@@ -107,31 +107,78 @@ variable "workload_analytics" {
 
 }
 
+variable "datalake_scale" {
+  type = string
 
-# variable "datalake_scale" {
-#   type = string
+  description = "The scale of the datalake. Valid values are LIGHT_DUTY, ENTERPRISE."
 
-#   description = "The scale of the datalake. Valid values are LIGHT_DUTY, MEDIUM_DUTY_HA."
+  validation {
+    condition     = (var.datalake_scale == null ? true : contains(["LIGHT_DUTY", "ENTERPRISE", "MEDIUM_DUTY_HA"], var.datalake_scale))
+    error_message = "Valid values for var: datalake_scale are (LIGHT_DUTY, ENTERPRISE, MEDIUM_DUTY_HA)."
+  }
 
-#   validation {
-#     condition     = contains(["LIGHT_DUTY", "MEDIUM_DUTY_HA"], var.datalake_scale)
-#     error_message = "Valid values for var: datalake_scale are (LIGHT_DUTY, MEDIUM_DUTY_HA)."
-#   }
+}
 
-# }
 
-# variable "datalake_version" {
-#   type = string
+variable "datalake_version" {
+  type = string
 
-#   description = "The Datalake Runtime version. Valid values are semantic versions, e.g. 7.2.16"
+  description = "The Datalake Runtime version. Valid values are latest or a semantic version, e.g. 7.2.17"
 
-#   validation {
-#     condition     = length(regexall("\\d+\\.\\d+.\\d+", var.datalake_version)) > 0
-#     error_message = "Valid values for var: datalake_version must match semantic versioning conventions."
-#   }
+  validation {
+    condition     = (var.datalake_version == "latest" ? true : length(regexall("\\d+\\.\\d+.\\d+", var.datalake_version)) > 0)
+    error_message = "Valid values for var: datalake_version are 'latest' or a semantic versioning conventions."
+  }
 
-# }
+  default = "latest"
+}
 
+variable "datalake_custom_instance_groups" {
+  type = list(
+    object({
+      name          = string,
+      instance_type = optional(string)
+    })
+  )
+
+  description = "A set of custom instance groups for the datalake."
+
+}
+
+variable "datalake_java_version" {
+  type = number
+
+  description = "The Java major version to use on the datalake cluster."
+
+}
+
+variable "datalake_image" {
+  type = object({
+    id      = optional(string)
+    catalog = optional(string)
+  })
+
+  description = "The image to use for the datalake. Can only be used when the 'datalake_version' parameter is set to null. You can use 'catalog' name and/or 'id' for selecting an image."
+
+}
+variable "datalake_recipes" {
+  type = set(
+    object({
+      instance_group_name = string,
+      recipe_names        = set(object({}))
+    })
+  )
+
+  description = "Additional recipes that will be attached on the datalake instances"
+
+}
+
+variable "datalake_polling_timeout" {
+  type = number
+
+  description = "Timeout value in minutes for how long to poll for CDP datalake resource creation/deletion"
+
+}
 # ------- Cloud Service Provider Settings -------
 
 variable "project_id" {
@@ -261,6 +308,18 @@ variable "xaccount_service_account_private_key" {
 
 }
 
+variable "idbroker_service_account_email" {
+  type = string
+
+  description = "Email id of the service account for IDBroker"
+
+    validation {
+    condition     = var.idbroker_service_account_email != null
+    error_message = "Valid values for var: idbroker_service_account_email must be a valid Email id for the GCP IDBroker Service Account."
+  }
+
+}
+
 variable "log_service_account_email" {
   type = string
 
@@ -269,6 +328,30 @@ variable "log_service_account_email" {
     validation {
     condition     = var.log_service_account_email != null
     error_message = "Valid values for var: log_service_account_email must be a valid Email id for the GCP Log Service Account."
+  }
+
+}
+
+variable "ranger_audit_service_account_email" {
+  type = string
+
+  description = "Email id of the service account for Ranger Audit"
+
+    validation {
+    condition     = var.ranger_audit_service_account_email != null
+    error_message = "Valid values for var: ranger_audit_service_account_email must be a valid Email id for the GCP Ranger Audit Service Account."
+  }
+
+}
+
+variable "datalake_admin_service_account_email" {
+  type = string
+
+  description = "Email id of the service account for Datalake Admin"
+
+    validation {
+    condition     = var.datalake_admin_service_account_email != null
+    error_message = "Valid values for var: datalake_admin_service_account_email must be a valid Email id for the GCP Datalake Admin Service Account."
   }
 
 }

@@ -30,6 +30,6 @@ resource "google_compute_subnetwork" "cdp_subnets" {
 
   ip_cidr_range = each.value.cidr
 
-  private_ip_google_access = true
+  # private_ip_google_access = true
 
 }
