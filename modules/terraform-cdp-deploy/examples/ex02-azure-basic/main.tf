@@ -133,7 +133,7 @@ resource "azurerm_role_definition" "custom_idbroker_role1" {
       "Microsoft.Compute/locations/*",
       "Microsoft.Compute/virtualMachines/*",
       "Microsoft.Compute/virtualMachineScaleSets/*",
-      "Microsoft.Compute/cloudServices/* ",
+      "Microsoft.Compute/cloudServices/*",
       "Microsoft.Compute/disks/write",
       "Microsoft.Compute/disks/read",
       "Microsoft.Compute/disks/delete",
@@ -167,7 +167,7 @@ resource "azurerm_role_definition" "custom_idbroker_role1" {
       "Microsoft.Resources/deployments/*",
       "Microsoft.Resources/subscriptions/resourceGroups/read",
       "Microsoft.SerialConsole/serialPorts/connect/action",
-      "Microsoft.SqlVirtualMachine/* ",
+      "Microsoft.SqlVirtualMachine/*",
       "Microsoft.Storage/storageAccounts/listKeys/action",
       "Microsoft.Storage/storageAccounts/read",
       "Microsoft.Support/*"
