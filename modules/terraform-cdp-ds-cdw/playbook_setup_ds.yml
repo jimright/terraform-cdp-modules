@@ -1,0 +1,188 @@
+---
+- name: Create any required CDP Data Services
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+############# Get CDP Environment Details #############
+  - name: Get Environment details
+    tags:
+      - always
+    block:
+      - name: Query for the CDP Public Cloud Environment
+        cloudera.cloud.env_info:
+          name: "{{ cdp_env }}"
+        register: __env
+
+      - name: Assert existence of the CDP Public Cloud Environment
+        ansible.builtin.assert:
+          that:
+            - __env.environments | length == 1
+            - __env.environments[0].status == "AVAILABLE"
+          fail_msg: "CDP Public Cloud target Environment either is missing or invalid: {{ cdp_env }}"
+          quiet: yes  
+
+      - name: Save the Environment CRN
+        ansible.builtin.set_fact:
+          cdp_env_crn: "{{ __env.environments[0].crn }}"
+          cdp_network_subnets: "{{ __env.environments[0].network.subnetIds }}"
+
+############# Debugging #############
+  - name: Print inputs
+    ansible.builtin.debug:
+      msg:
+        - Environment name is "{{ cdp_env }}"
+        - cdp_network_subnets "{{ cdp_network_subnets }}" 
+
+############# CDW #############
+
+  # - name: Set up of CDW service - Azure (command line version)
+  #   when: infra_type | lower == 'azure'
+  #   tags:
+  #     - cdw
+  #   ansible.builtin.command:
+  #     cdp dw create-cluster 
+  #     --environment-crn {{ cdp_env_crn }}
+  #     --use-overlay-network 
+  #     --no-use-private-load-balancer 
+  #     --azure-options userAssignedManagedIdentity="{{ azure_aks_credential_managed_identity_id }}",subnetId="{{ cdp_network_subnets[0] }}",enableSpotInstances=false
+
+  - name: Set up of CDW service - AWS (command line version)
+    when: infra_type | lower == 'aws'
+    tags:
+      - cdw
+    ansible.builtin.command: 
+      cdp dw create-cluster 
+      --environment-crn {{ cdp_env_crn }}
+      --no-use-overlay-network 
+      --no-use-private-load-balancer 
+      --aws-options workerSubnetIds="{{ cdp_network_subnets | join(',') }}",lbSubnetIds="{{ cdp_network_subnets | join(',') }}"
+
+  - name: Set up of CDW service - Azure (cloudera.cloud version)
+    when: infra_type | lower == 'azure'
+    tags:
+      - cdw
+    cloudera.cloud.dw_cluster:
+      env_crn: "{{ cdp_env_crn }}"
+      az_subnet: "{{ cdp_network_subnets[0] }}"
+      az_enable_az: False
+      az_managed_identity: "{{ azure_aks_credential_managed_identity_id }}"
+      private_load_balancer: False
+      overlay: True
+      az_enable_spot_instances: False
+      state: present
+      wait: yes
+    register: __dw_cluster
+
+  # - name: Set up of CDW service - AWS (cloudera.cloud version)
+  #   when: infra_type | lower == 'aws'
+  #   tags:
+  #     - cdw
+  #   cloudera.cloud.dw_cluster:
+  #     name: "{{ env_prefix }}-cdw"
+  #     env_crn: "{{ cdp_env_crn }}"
+  #     private_load_balancer: False
+  #     overlay: True
+  #     aws_lb_subnets: "{{ cdp_network_subnets }}"
+  #     aws_worker_subnets: "{{ cdp_network_subnets }}"
+  #     state: present
+  #     wait: yes
+
+  # TODO: Use the name parameter to get default DBC
+  - name: Gather information about the database catalog
+    cloudera.cloud.dw_database_catalog_info:
+      # name: ...
+      cluster_id: "{{ __dw_cluster.cluster.id }}"
+    register: __dw_dbc_info
+
+############# CDW - Create a Hive Virtual Warehouse #############
+# TODO: Make this asynchronous
+# TODO: Support following paramaters in autoscaling request:
+#  autoSuspendTimeoutSeconds hiveScaleWaitTimeSeconds hiveDesiredFreeCapacity
+  - name: Set up of HIVE Virtual Warehouse
+    tags:
+      - cdw
+    cloudera.cloud.dw_virtual_warehouse:
+      name: "{{ env_prefix }}-hive-vw"
+      cluster_id: "{{ __dw_cluster.cluster.id }}" 
+      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+      type: hive
+      template: xsmall
+      autoscaling_min_nodes: 2
+      autoscaling_max_nodes: 6
+      enable_platform_jwt_auth: False
+
+# cdp dw create-vw 
+# --cluster-id env-lff8nh 
+# --dbc-id warehouse-1704481007-q9pd 
+# --vw-type hive 
+# --name hb-az-hive-vw 
+# --template xsmall 
+# --autoscaling "minClusters"=2,"maxClusters"=6,"autoSuspendTimeoutSeconds"=300,"hiveScaleWaitTimeSeconds"=300,"hiveDesiredFreeCapacity"=1 
+# --no-platform-jwt-auth
+
+############# CDW - Create an Impala Virtual Warehouse #############
+# TODO: Make this asynchronous
+# TODO: Support following paramaters in autoscaling request:
+#  autoSuspendTimeoutSeconds impalaScaleUpDelaySeconds impalaScaleDownDelaySeconds
+# TODO: Support following paramters in impalaHASettings request:
+# highAvailabilityMode enableCatalogHighAvailability
+  - name: Set up of Impala Virtual Warehouse
+    tags:
+      - cdw
+    cloudera.cloud.dw_virtual_warehouse:
+      name: "{{ env_prefix }}-impala-vw"
+      cluster_id: "{{ __dw_cluster.cluster.id }}" 
+      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+      type: impala
+      template: xsmall
+      autoscaling_min_nodes: 2
+      autoscaling_max_nodes: 6
+      enable_platform_jwt_auth: False
+
+# cdp dw create-vw 
+# --cluster-id env-lff8nh 
+# --dbc-id warehouse-1704481007-q9pd 
+# --vw-type impala 
+# --name hb-az-impala-vw 
+# --template xsmall 
+# --autoscaling minClusters=2,maxClusters=6,autoSuspendTimeoutSeconds=300,enableUnifiedAnalytics=true,impalaHighAvailabilityMode=ACTIVE_PASSIVE,impalaScaleUpDelaySeconds=20,impalaScaleDownDelaySeconds=20,impalaEnableCatalogHighAvailability=true 
+# --no-platform-jwt-auth
+
+############# CDW - Create an Impala Virtual Warehouse with Unified Analytics #############
+
+# TODO: Make this asynchronous
+# TODO: Support following paramaters in autoscaling request:
+#  autoSuspendTimeoutSeconds impalaScaleUpDelaySeconds impalaScaleDownDelaySeconds
+# TODO: Support following paramters in impalaHASettings request:
+# highAvailabilityMode enableCatalogHighAvailability
+  - name: Set up of Impala Virtual Warehouse with Unified Analytics
+    tags:
+      - cdw
+    cloudera.cloud.dw_virtual_warehouse:
+      name: "{{ env_prefix }}-impala-vw-ua"
+      cluster_id: "{{ __dw_cluster.cluster.id }}" 
+      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+      type: impala
+      template: xsmall
+      autoscaling_min_nodes: 2
+      autoscaling_max_nodes: 6
+      enable_platform_jwt_auth: False
+      enable_unified_analytics: True
+
+############# CDW - Create a DataViz Cluster #############
+# TODO: Use outputs from TF for adminGroups & userGroups parameters
+# TODO: Support the templateName parameter
+  - name: Create a CDW DataViz Cluster
+    tags:
+      - cdw
+    cloudera.cloud.dw_data_visualization:
+      name: "{{ env_prefix }}-data-viz"
+      cluster_id: "{{ __dw_cluster.cluster.id }}" 
+      config:
+        adminGroups: ["{{ cdp_admin_group }}"]
+        userGroups: ["{{ cdp_user_group }}"]
+    vars:
+      cdp_admin_group: "{{ env_prefix }}-cdp-admin-group"
+      cdp_user_group: "{{ env_prefix }}-cdp-user-group"
