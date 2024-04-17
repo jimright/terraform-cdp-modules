@@ -50,6 +50,18 @@ variable "cdp_environment_name" {
 
 }
 
+# ------- CDP Settings - CDW deployment -------
+
+variable "cdp_admin_group" {
+  type = string
+  description = "CDP Admin Group name. Used for dw_data_visualization configuration."
+}
+
+variable "cdp_user_group" {
+  type = string
+  description = "CDP User Group name. Used for dw_data_visualization configuration."
+}
+
 # ------- Cloud Settings - General -------
 variable "region" {
   type        = string
