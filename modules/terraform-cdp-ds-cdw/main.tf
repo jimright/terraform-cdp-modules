@@ -26,6 +26,17 @@ resource "azurerm_role_assignment" "cdp_cdw_aks_cred_assign" {
   description = each.value.description
 }
 
+resource "azurerm_role_assignment" "cdp_cdw_aks_cred_storage_assign" {
+
+  count = (var.infra_type == "azure") ? 1 : 0
+
+  scope                = data.azurerm_storage_account.data_storage_account.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_user_assigned_identity.cdp_cdw_aks_cred[0].principal_id
+
+  description = "Storage Blob Data Owner assignment to CDP Data Storage Container"
+}
+
 # NOTE: Hit issues running this on localhost because ansible_python_interpreter lookup is performed (venv ignored)
 # resource "ansible_playbook" "configure_ds" {
 #   playbook = "${path.module}/playbook_setup_ds.yml"

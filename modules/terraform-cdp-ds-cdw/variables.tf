@@ -85,6 +85,14 @@ variable "azure_aks_credential_managed_identity_name" {
     default = null
 }
 
+variable "azure_data_storage_account" {
+    type = string
+
+    description = "Name of the Azure Storage Account used for CDP Data"
+
+    default = null
+}
+
 variable "cdw_aks_cred_role_assignments" {
   type = list(object({
     role        = string

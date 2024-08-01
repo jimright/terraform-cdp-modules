@@ -19,3 +19,10 @@ data "azurerm_subscription" "current" {}
 data "azurerm_resource_group" "cdp_ds_rmgp" {
   name = var.azure_resource_group_name
 }
+
+# Find details about the data storage account
+data "azurerm_storage_account" "data_storage_account" {
+  name                = var.azure_data_storage_account
+  resource_group_name = var.azure_resource_group_name
+
+}
