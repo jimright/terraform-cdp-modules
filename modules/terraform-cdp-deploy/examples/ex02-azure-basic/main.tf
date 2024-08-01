@@ -135,9 +135,12 @@ module "cdp_ds_cdw" {
 
   cdp_environment_name      = module.cdp_deploy.cdp_environment_name
   azure_resource_group_name = module.cdp_azure_prereqs.azure_resource_group_name
+  cdp_admin_group =         module.cdp_deploy.cdp_iam_admin_group_name
+  cdp_user_group =         module.cdp_deploy.cdp_iam_user_group_name
+
   region                    = var.azure_region
-  
   depends_on = [
+    module.cdp_azure_prereqs,
     module.cdp_deploy
   ]
 }

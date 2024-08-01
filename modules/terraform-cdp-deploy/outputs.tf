@@ -31,3 +31,23 @@ output "cdp_environment_crn" {
 
   description = "CDP Environment CRN"
 }
+
+output "cdp_iam_admin_group_name" {
+  value = try(
+    module.cdp_on_aws[0].cdp_iam_admin_group_name,
+    module.cdp_on_azure[0].cdp_iam_admin_group_name,
+    module.cdp_on_gcp[0].cdp_iam_admin_group_name
+  )
+
+  description = "CDP Admin Group name"
+}
+
+output "cdp_iam_user_group_name" {
+  value = try(
+    module.cdp_on_aws[0].cdp_iam_user_group_name,
+    module.cdp_on_azure[0].cdp_iam_user_group_name,
+    module.cdp_on_gcp[0].cdp_iam_user_group_name
+  )
+
+  description = "CDP User Group name"
+}

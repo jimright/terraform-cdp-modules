@@ -23,3 +23,15 @@ output "cdp_environment_crn" {
 
   description = "CDP Environment CRN"
 }
+
+output "cdp_iam_admin_group_name" {
+  value = cdp_iam_group.cdp_admin_group.group_name
+
+  description = "CDP Admin Group name"
+}
+
+output "cdp_iam_user_group_name" {
+    value = cdp_iam_group.cdp_user_group.group_name
+
+  description = "CDP User Group name"
+}
