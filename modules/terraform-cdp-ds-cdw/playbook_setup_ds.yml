@@ -49,37 +49,39 @@
         managed_identity: "{{ azure_aks_credential_managed_identity_id }}"
         enable_spot_instances: False
       private_load_balancer: False
+      public_worker_node: True
       overlay: True
       state: present
       wait: yes
     register: __dw_cluster
 
   # NOTE: CDW activation error (only works through UI)
-  - name: Set up of CDW service - AWS (command line version)
-    when: infra_type | lower == 'aws'
-    tags:
-      - cdw
-    ansible.builtin.command: 
-      cdp dw create-cluster 
-      --environment-crn {{ cdp_env_crn }}
-      --no-use-overlay-network 
-      --no-use-private-load-balancer 
-      --aws-options workerSubnetIds="{{ cdp_network_subnets | join(',') }}",lbSubnetIds="{{ cdp_network_subnets | join(',') }}"
-  
-  # TODO: Update cloudera.cloud for new AWS API params
-  # - name: Set up of CDW service - AWS (cloudera.cloud version)
+  # - name: Set up of CDW service - AWS (command line version)
   #   when: infra_type | lower == 'aws'
   #   tags:
   #     - cdw
-  #   cloudera.cloud.dw_cluster:
-  #     name: "{{ env_prefix }}-cdw"
-  #     env_crn: "{{ cdp_env_crn }}"
-  #     private_load_balancer: False
-  #     overlay: True
-  #     aws_lb_subnets: "{{ cdp_network_subnets }}"
-  #     aws_worker_subnets: "{{ cdp_network_subnets }}"
-  #     state: present
-  #     wait: yes
+  #   ansible.builtin.command: 
+  #     cdp dw create-cluster 
+  #     --environment-crn {{ cdp_env_crn }}
+  #     --no-use-overlay-network 
+  #     --no-use-private-load-balancer 
+  #     --aws-options workerSubnetIds="{{ cdp_network_subnets | join(',') }}",lbSubnetIds="{{ cdp_network_subnets | join(',') }}"
+  
+  # TODO: Update cloudera.cloud for new AWS API params
+  - name: Set up of CDW service - AWS (cloudera.cloud version)
+    when: infra_type | lower == 'aws'
+    tags:
+      - cdw
+    cloudera.cloud.dw_cluster:
+      name: "{{ env_prefix }}-cdw"
+      env_crn: "{{ cdp_env_crn }}"
+      aws_worker_subnets: "{{ cdp_network_subnets }}"
+      aws_lb_subnets: "{{ cdp_network_subnets }}"
+      private_load_balancer: False
+      public_worker_node: True
+      overlay: True
+      state: present
+      wait: yes
 
   # TODO: Use the name parameter to get default DBC
   - name: Gather information about the database catalog
