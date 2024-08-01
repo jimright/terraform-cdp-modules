@@ -11,18 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Access information about Azure Subscription
-data "azurerm_subscription" "current" {}
-
-# Find details of the Azure Resource group
-data "azurerm_resource_group" "cdp_ds_rmgp" {
-  name = var.azure_resource_group_name
-}
-
-# Find details about the data storage account
-data "azurerm_storage_account" "data_storage_account" {
-  name                = var.azure_data_storage_account
-  resource_group_name = var.azure_resource_group_name
-
-}

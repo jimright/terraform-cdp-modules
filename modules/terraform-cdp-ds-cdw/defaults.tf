@@ -11,15 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-locals {
-  # ------- Global settings -------
-  env_tags = merge(var.agent_source_tag, (
-    coalesce(var.env_tags,
-      { env_prefix = var.env_prefix }
-    ))
-  )
-
-  azure_aks_credential_managed_identity_name = coalesce(var.azure_aks_credential_managed_identity_name,
-  "${var.env_prefix}-aks-credential-identity")
-}

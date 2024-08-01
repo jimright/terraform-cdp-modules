@@ -75,8 +75,24 @@ module "cdp_azure_prereqs" {
 
 }
 
+module "cdp_azure_cdw_aks" {
+  source = "../../../terraform-azure-cdw-permissions"
+
+  azure_resource_group_name = module.cdp_azure_prereqs.azure_resource_group_name
+  azure_region              = var.azure_region
+  
+  azure_aks_credential_managed_identity_name = "${var.env_prefix}-aks-credential-identity"
+  azure_data_storage_account = module.cdp_azure_prereqs.azure_data_storage_account
+
+  tags = var.env_tags
+
+  depends_on = [
+    module.cdp_azure_prereqs
+  ]
+}
+
 module "cdp_deploy" {
-  source = "../.."
+  source = "../../../terraform-cdp-deploy"
 
   env_prefix          = var.env_prefix
   infra_type          = "azure"
@@ -97,7 +113,6 @@ module "cdp_deploy" {
   azure_cdp_gateway_subnet_names = module.cdp_azure_prereqs.azure_cdp_gateway_subnet_names
 
   azure_environment_flexible_server_delegated_subnet_names = module.cdp_azure_prereqs.azure_cdp_flexible_server_delegated_subnet_names
-  azure_datalake_flexible_server_delegated_subnet_name     = try(module.cdp_azure_prereqs.azure_cdp_flexible_server_delegated_subnet_names[0], null)
   azure_database_private_dns_zone_id                       = module.cdp_azure_prereqs.azure_database_private_dns_zone_id
 
   azure_security_group_default_uri = module.cdp_azure_prereqs.azure_security_group_default_uri
@@ -121,5 +136,28 @@ module "cdp_deploy" {
 
   depends_on = [
     module.cdp_azure_prereqs
+  ]
+}
+
+module "cdp_ds_cdw" {
+
+  count = var.enable_cdw ? 1 : 0
+
+  source = "../.."
+
+  env_prefix = var.env_prefix
+  region     = var.azure_region
+  infra_type = "azure"
+
+  cdp_environment_name      = module.cdp_deploy.cdp_environment_name
+  cdp_admin_group =         module.cdp_deploy.cdp_iam_admin_group_name
+  cdp_user_group =         module.cdp_deploy.cdp_iam_user_group_name
+
+  azure_aks_managed_identity_name = module.cdp_azure_cdw_aks.azure_aks_managed_identity_id
+
+  depends_on = [
+    module.cdp_azure_prereqs,
+    module.cdp_azure_cdw_aks,
+    module.cdp_deploy
   ]
 }

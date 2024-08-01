@@ -13,20 +13,21 @@
 # limitations under the License.
 
 # ------- Global settings -------
+variable "aws_region" {
+  type        = string
+  description = "Region which Cloud resources will be created"
+}
+
 variable "env_prefix" {
   type        = string
   description = "Shorthand name for the environment. Used in resource descriptions"
 }
 
-variable "azure_region" {
-  type        = string
-  description = "Region which Cloud resources will be created"
-}
-
-variable "public_key_text" {
+variable "aws_key_pair" {
   type = string
 
-  description = "SSH Public key string for the nodes of the CDP environment"
+  description = "Name of the Public SSH key for the CDP environment"
+
 }
 
 variable "env_tags" {
@@ -67,39 +68,51 @@ variable "ingress_extra_cidrs_and_ports" {
   description = "List of extra CIDR blocks and ports to include in Security Group Ingress rules"
 }
 
-# ------- Optional inputs for BYO-VNet -------
-variable "create_vnet" {
+# ------- Optional inputs for BYO-VPC -------
+variable "create_vpc" {
   type = bool
 
-  description = "Flag to specify if the VNet should be created"
+  description = "Flag to specify if the VPC should be created"
 
   default = true
 }
 
-variable "cdp_resourcegroup_name" {
+variable "cdp_vpc_id" {
   type        = string
-  description = "Pre-existing Resource Group for CDP environment. Required if create_vnet is false."
+  description = "VPC ID for CDP environment. Required if create_vpc is false."
 
   default = null
 }
 
-variable "cdp_vnet_name" {
-  type        = string
-  description = "Pre-existing VNet Name for CDP environment. Required if create_vnet is false."
-
-  default = null
-}
-
-variable "cdp_subnet_names" {
+variable "cdp_public_subnet_ids" {
   type        = list(any)
-  description = "List of subnet names for CDP Resources. Required if create_vnet is false."
+  description = "List of public subnet ids. Required if create_vpc is false."
 
   default = null
 }
 
-variable "cdp_gw_subnet_names" {
+variable "cdp_private_subnet_ids" {
   type        = list(any)
-  description = "List of subnet names for CDP Gateway. Required if create_vnet is false."
+  description = "List of private subnet ids. Required if create_vpc is false."
 
   default = null
+}
+
+# ------- Optional inputs for Control Plane Connectivity in fully private environment -------
+variable "private_network_extensions" {
+  type = bool
+
+  description = "Enable creation of resources for connectivity to CDP Control Plane (public subnet and NAT Gateway) for Private Deployment. Only relevant for private deployment template"
+
+  default = true
+}
+
+# ------- Data Services -------
+variable "enable_cdw" {
+  type = bool
+
+  description = "Flag to specify if CDW should be enabled"
+
+  default = false
+
 }

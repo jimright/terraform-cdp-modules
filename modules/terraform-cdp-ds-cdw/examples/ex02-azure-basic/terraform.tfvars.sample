@@ -38,6 +38,10 @@ ingress_extra_cidrs_and_ports = {
  ports = [443, 22]
 }
 
+# ------- Optional inputs for Data Services -------
+# **NOTE: Uncomment to provision data services
+# enable_cdw = false # Set to true to provision CDW
+
 # ------- Optional inputs for BYO-VNet -------
 # **NOTE: Uncomment below settings if required
 

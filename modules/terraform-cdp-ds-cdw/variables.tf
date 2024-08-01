@@ -23,18 +23,11 @@ variable "infra_type" {
   }
 }
 
-variable "env_tags" {
+variable "tags" {
   type        = map(any)
   description = "Tags applied to provisioned resources"
 
   default = null
-}
-
-variable "agent_source_tag" {
-  type        = map(any)
-  description = "Tag to identify deployment source"
-
-  default = { agent_source = "tf-cdp-module" }
 }
 
 variable "env_prefix" {
@@ -70,43 +63,10 @@ variable "region" {
 }
 
 # ------- Azure specific settings -------
-variable "azure_resource_group_name" {
-  type        = string
-  description = "Azrue Resource Group for CDP environment."
-
-  default = null
-}
-
-variable "azure_aks_credential_managed_identity_name" {
+variable "azure_aks_managed_identity_name" {
     type = string
 
     description = "Name of the Managed Identity for the AKS Credential"
 
     default = null
-}
-
-variable "azure_data_storage_account" {
-    type = string
-
-    description = "Name of the Azure Storage Account used for CDP Data"
-
-    default = null
-}
-
-variable "cdw_aks_cred_role_assignments" {
-  type = list(object({
-    role        = string
-    description = optional(string)
-    })
-  )
-
-  description = "List of Role Assignments for the AKS Credential"
-
-  default = [
-    {
-      "description" : "Assign Contributor Role to AKS Credential",
-      "role" : "Contributor"
-    }
-  ]
-
 }

@@ -46,7 +46,7 @@
       azure:
         subnet: "{{ cdp_network_subnets[0] }}"
         enable_az: False
-        managed_identity: "{{ azure_aks_credential_managed_identity_id }}"
+        managed_identity: "{{ azure_aks_managed_identity_id }}"
         enable_spot_instances: False
       private_load_balancer: False
       public_worker_node: True
@@ -83,161 +83,161 @@
       state: present
       wait: yes
 
-  # TODO: Use the name parameter to get default DBC
-  - name: Gather information about the database catalog
-    cloudera.cloud.dw_database_catalog_info:
-      # name: ...
-      cluster_id: "{{ __dw_cluster.cluster.id }}"
-    register: __dw_dbc_info
-    until: 
-      - __dw_dbc_info.database_catalogs | length > 0
-      - __dw_dbc_info.database_catalogs[0].status == 'Running'
-    retries: 10
-    delay: 30
+#   # TODO: Use the name parameter to get default DBC
+#   - name: Gather information about the database catalog
+#     cloudera.cloud.dw_database_catalog_info:
+#       # name: ...
+#       cluster_id: "{{ __dw_cluster.cluster.id }}"
+#     register: __dw_dbc_info
+#     until: 
+#       - __dw_dbc_info.database_catalogs | length > 0
+#       - __dw_dbc_info.database_catalogs[0].status == 'Running'
+#     retries: 10
+#     delay: 30
 
-############# Debugging #############
-  - name: Print inputs
-    ansible.builtin.debug:
-      msg:
-        - __dw_dbc_info is "{{ __dw_dbc_info }}"
+# ############# Debugging #############
+#   - name: Print inputs
+#     ansible.builtin.debug:
+#       msg:
+#         - __dw_dbc_info is "{{ __dw_dbc_info }}"
 
-############# CDW - Create a Hive Virtual Warehouse #############
+# ############# CDW - Create a Hive Virtual Warehouse #############
 
-  - name: Start set up of HIVE Virtual Warehouse
-    tags:
-      - cdw
-    cloudera.cloud.dw_virtual_warehouse:
-      name: "{{ env_prefix }}-hive-vw"
-      cluster_id: "{{ __dw_cluster.cluster.id }}" 
-      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
-      type: hive
-      template: xsmall
-      autoscaling:
-        min_nodes: 2
-        max_nodes: 6
-        auto_suspend_timeout_seconds: 300
-        hive_scale_wait_time_seconds: 300
-        hive_desired_free_capacity: 1
-      enable_platform_jwt_auth: False
-    async: 3600 # 1 hour timeout
-    poll: 0
-    register: __hive_vw
+#   - name: Start set up of HIVE Virtual Warehouse
+#     tags:
+#       - cdw
+#     cloudera.cloud.dw_virtual_warehouse:
+#       name: "{{ env_prefix }}-hive-vw"
+#       cluster_id: "{{ __dw_cluster.cluster.id }}" 
+#       dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+#       type: hive
+#       template: xsmall
+#       autoscaling:
+#         min_nodes: 2
+#         max_nodes: 6
+#         auto_suspend_timeout_seconds: 300
+#         hive_scale_wait_time_seconds: 300
+#         hive_desired_free_capacity: 1
+#       enable_platform_jwt_auth: False
+#     async: 3600 # 1 hour timeout
+#     poll: 0
+#     register: __hive_vw
 
-############# CDW - Create an Impala Virtual Warehouse #############
+# ############# CDW - Create an Impala Virtual Warehouse #############
 
-  - name: Start set up of Impala Virtual Warehouse
-    tags:
-      - cdw
-    cloudera.cloud.dw_virtual_warehouse:
-      name: "{{ env_prefix }}-impala-vw"
-      cluster_id: "{{ __dw_cluster.cluster.id }}" 
-      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
-      type: impala
-      template: xsmall
-      autoscaling:
-        min_nodes: 2
-        max_nodes: 6
-        auto_suspend_timeout_seconds: 300
-        impala_scale_up_delay_seconds: 20
-        impala_scale_down_delay_seconds: 20
-      impala_ha:
-        enable_catalog_high_availability: true
-        high_availability_mode: "ACTIVE_PASSIVE"
-      enable_platform_jwt_auth: False
-    async: 3600 # 1 hour timeout
-    poll: 0
-    register: __impala_vw
+#   - name: Start set up of Impala Virtual Warehouse
+#     tags:
+#       - cdw
+#     cloudera.cloud.dw_virtual_warehouse:
+#       name: "{{ env_prefix }}-impala-vw"
+#       cluster_id: "{{ __dw_cluster.cluster.id }}" 
+#       dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+#       type: impala
+#       template: xsmall
+#       autoscaling:
+#         min_nodes: 2
+#         max_nodes: 6
+#         auto_suspend_timeout_seconds: 300
+#         impala_scale_up_delay_seconds: 20
+#         impala_scale_down_delay_seconds: 20
+#       impala_ha:
+#         enable_catalog_high_availability: true
+#         high_availability_mode: "ACTIVE_PASSIVE"
+#       enable_platform_jwt_auth: False
+#     async: 3600 # 1 hour timeout
+#     poll: 0
+#     register: __impala_vw
 
-############# CDW - Create an Impala Virtual Warehouse with Unified Analytics #############
+# ############# CDW - Create an Impala Virtual Warehouse with Unified Analytics #############
 
-  - name: Start set up of Impala Virtual Warehouse with Unified Analytics
-    tags:
-      - cdw
-    cloudera.cloud.dw_virtual_warehouse:
-      name: "{{ env_prefix }}-impala-ua-vw"
-      cluster_id: "{{ __dw_cluster.cluster.id }}" 
-      dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
-      type: impala
-      template: xsmall
-      autoscaling:
-        min_nodes: 2
-        max_nodes: 6
-        auto_suspend_timeout_seconds: 300
-        impala_scale_up_delay_seconds: 20
-        impala_scale_down_delay_seconds: 20
-      impala_ha:
-        enable_catalog_high_availability: true
-        high_availability_mode: "ACTIVE_PASSIVE"        
-      enable_platform_jwt_auth: False
-      enable_unified_analytics: True
-    async: 3600 # 1 hour timeout
-    poll: 0
-    register: __impala_ua_vw
+#   - name: Start set up of Impala Virtual Warehouse with Unified Analytics
+#     tags:
+#       - cdw
+#     cloudera.cloud.dw_virtual_warehouse:
+#       name: "{{ env_prefix }}-impala-ua-vw"
+#       cluster_id: "{{ __dw_cluster.cluster.id }}" 
+#       dbc_id: "{{ __dw_dbc_info.database_catalogs | map(attribute='id') | list | first }}"
+#       type: impala
+#       template: xsmall
+#       autoscaling:
+#         min_nodes: 2
+#         max_nodes: 6
+#         auto_suspend_timeout_seconds: 300
+#         impala_scale_up_delay_seconds: 20
+#         impala_scale_down_delay_seconds: 20
+#       impala_ha:
+#         enable_catalog_high_availability: true
+#         high_availability_mode: "ACTIVE_PASSIVE"        
+#       enable_platform_jwt_auth: False
+#       enable_unified_analytics: True
+#     async: 3600 # 1 hour timeout
+#     poll: 0
+#     register: __impala_ua_vw
 
-############# CDW - Create a DataViz Cluster #############
+# ############# CDW - Create a DataViz Cluster #############
 
-  - name: Start Create a CDW DataViz Cluster
-    tags:
-      - cdw
-    cloudera.cloud.dw_data_visualization:
-      name: "{{ env_prefix }}-data-viz"
-      cluster_id: "{{ __dw_cluster.cluster.id }}" 
-      config:
-        adminGroups: ["{{ cdp_admin_group }}"]
-        userGroups: ["{{ cdp_user_group }}"]
-      template_name: small
-    async: 3600 # 1 hour timeout
-    poll: 0
-    register: __dataviz_cluster
+#   # - name: Start Create a CDW DataViz Cluster
+#   #   tags:
+#   #     - cdw
+#   #   cloudera.cloud.dw_data_visualization:
+#   #     name: "{{ env_prefix }}-data-viz"
+#   #     cluster_id: "{{ __dw_cluster.cluster.id }}" 
+#   #     config:
+#   #       adminGroups: ["{{ cdp_admin_group }}"]
+#   #       userGroups: ["{{ cdp_user_group }}"]
+#   #     template_name: small
+#   #   async: 3600 # 1 hour timeout
+#   #   poll: 0
+#   #   register: __dataviz_cluster
 
-############# Wait on async creation of Virtual Warehouses #############
+# ############# Wait on async creation of Virtual Warehouses #############
 
-  - name: Monitor the set up of the HIVE Virtual Warehouse
-    tags:
-      - cdw
-    when:
-      - __hive_vw is defined
-    ansible.builtin.async_status:
-      jid: "{{ __hive_vw.ansible_job_id }}"
-    register: __hive_vw_async_check
-    until: __hive_vw_async_check.finished
-    retries: 120
-    delay: 30
+#   - name: Monitor the set up of the HIVE Virtual Warehouse
+#     tags:
+#       - cdw
+#     when:
+#       - __hive_vw is defined
+#     ansible.builtin.async_status:
+#       jid: "{{ __hive_vw.ansible_job_id }}"
+#     register: __hive_vw_async_check
+#     until: __hive_vw_async_check.finished
+#     retries: 120
+#     delay: 30
 
-  - name: Monitor the set up of the Impala Virtual Warehouse
-    tags:
-      - cdw
-    when:
-      - __impala_vw is defined
-    ansible.builtin.async_status:
-      jid: "{{ __impala_vw.ansible_job_id }}"
-    register: __impala_vw_async_check
-    until: __impala_vw_async_check.finished
-    retries: 120
-    delay: 30
+#   - name: Monitor the set up of the Impala Virtual Warehouse
+#     tags:
+#       - cdw
+#     when:
+#       - __impala_vw is defined
+#     ansible.builtin.async_status:
+#       jid: "{{ __impala_vw.ansible_job_id }}"
+#     register: __impala_vw_async_check
+#     until: __impala_vw_async_check.finished
+#     retries: 120
+#     delay: 30
 
-  - name: Monitor the set up of the Impala Virtual Warehouse with Unified Analytics 
-    tags:
-      - cdw
-    when:
-      - __impala_ua_vw is defined
-    ansible.builtin.async_status:
-      jid: "{{ __impala_ua_vw.ansible_job_id }}"
-    register: __impala_ua_vw_async_check
-    until: __impala_ua_vw_async_check.finished
-    retries: 120
-    delay: 30
+#   - name: Monitor the set up of the Impala Virtual Warehouse with Unified Analytics 
+#     tags:
+#       - cdw
+#     when:
+#       - __impala_ua_vw is defined
+#     ansible.builtin.async_status:
+#       jid: "{{ __impala_ua_vw.ansible_job_id }}"
+#     register: __impala_ua_vw_async_check
+#     until: __impala_ua_vw_async_check.finished
+#     retries: 120
+#     delay: 30
 
-############# Wait on async creation of Data Viz Cluster #############
+# ############# Wait on async creation of Data Viz Cluster #############
 
-  - name: Monitor the set up of the HIVE Virtual Warehouse
-    tags:
-      - cdw
-    when:
-      - __dataviz_cluster is defined
-    ansible.builtin.async_status:
-      jid: "{{ __dataviz_cluster.ansible_job_id }}"
-    register: __dataviz_cluster_async_check
-    until: __dataviz_cluster_async_check.finished
-    retries: 120
-    delay: 30
+#   - name: Monitor the set up of the HIVE Virtual Warehouse
+#     tags:
+#       - cdw
+#     when:
+#       - __dataviz_cluster is defined
+#     ansible.builtin.async_status:
+#       jid: "{{ __dataviz_cluster.ansible_job_id }}"
+#     register: __dataviz_cluster_async_check
+#     until: __dataviz_cluster_async_check.finished
+#     retries: 120
+#     delay: 30

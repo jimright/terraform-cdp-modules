@@ -13,24 +13,19 @@
 # limitations under the License.
 
 terraform {
+  required_version = ">= 1.5.7"
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "3.84.0"
-    }
     ansible = {
-      version = ">= 1.2.0"
+      version = "~> 1.2"
       source  = "ansible/ansible"
     }
     local = {
       source  = "hashicorp/local"
-      version = "2.2.3"
+      version = "~> 2.5.1"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "3.2.1"
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.2.1"
     }
   }
-
-  required_version = ">= 1.3.0"
 }
