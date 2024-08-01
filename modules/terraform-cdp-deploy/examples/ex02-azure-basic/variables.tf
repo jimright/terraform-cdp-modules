@@ -103,3 +103,13 @@ variable "cdp_gw_subnet_names" {
 
   default = null
 }
+
+# ------- Data Services -------
+variable "enable_cdw" {
+  type = bool
+
+  description = "Flag to specify if CDW should be enabled"
+
+  default = false
+
+}

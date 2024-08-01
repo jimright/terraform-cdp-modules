@@ -123,3 +123,21 @@ module "cdp_deploy" {
     module.cdp_azure_prereqs
   ]
 }
+
+module "cdp_ds_cdw" {
+
+  count = var.enable_cdw ? 1 : 0
+
+  source = "../../../terraform-cdp-ds-cdw"
+
+  infra_type = "azure"
+  env_prefix = var.env_prefix
+
+  cdp_environment_name      = module.cdp_deploy.cdp_environment_name
+  azure_resource_group_name = module.cdp_azure_prereqs.azure_resource_group_name
+  region                    = var.azure_region
+  
+  depends_on = [
+    module.cdp_deploy
+  ]
+}
