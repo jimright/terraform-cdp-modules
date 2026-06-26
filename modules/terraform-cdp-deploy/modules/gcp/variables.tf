@@ -377,7 +377,7 @@ variable "endpoint_access_scheme" {
 variable "availability_zones" {
   type = list(string)
 
-  description = "The zones of the environment in the given region. Multi-zone selection is not supported in GCP yet. It accepts only one zone until support is added."
+  description = "The zones of the environment in the given region. Specify multiple zones to enable cross-zone deployment of resources."
 
 }
 
