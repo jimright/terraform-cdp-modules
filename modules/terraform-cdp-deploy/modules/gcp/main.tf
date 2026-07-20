@@ -130,8 +130,8 @@ resource "cdp_datalake_gcp_datalake" "cdp_datalake" {
 
   count = var.environment_type != "HYBRID" ? 1 : 0
 
-  datalake_name    = var.datalake_name
-  environment_name = cdp_environments_gcp_environment.cdp_env.environment_name
+  datalake_name = var.datalake_name
+  environment   = cdp_environments_gcp_environment.cdp_env.environment_name
 
   cloud_provider_configuration = {
     service_account_email = var.idbroker_service_account_email

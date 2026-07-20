@@ -143,8 +143,8 @@ resource "cdp_environments_id_broker_mappings" "cdp_idbroker" {
 resource "cdp_datalake_aws_datalake" "cdp_datalake" {
   count = var.environment_type != "HYBRID" ? 1 : 0
 
-  datalake_name    = var.datalake_name
-  environment_name = cdp_environments_aws_environment.cdp_env.environment_name
+  datalake_name = var.datalake_name
+  environment   = cdp_environments_aws_environment.cdp_env.environment_name
 
   instance_profile      = var.idbroker_instance_profile_arn
   storage_location_base = var.data_storage_location

@@ -1190,7 +1190,7 @@ variable "gcp_cdp_gateway_subnet_names" {
 variable "gcp_availability_zones" {
   type = list(string)
 
-  description = "The zones of the environment in the given region. Multi-zone selection is not supported in GCP yet. It accepts only one zone until support is added."
+  description = "The zones of the environment in the given region. Specify multiple zones to enable cross-zone deployment of resources."
 
   default = null
 }
