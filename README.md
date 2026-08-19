@@ -30,6 +30,7 @@ This repository contains a number of Terraform modules for creation of the pre-r
 | [terraform-azure-cdw-permissions](modules/terraform-azure-cdw-permissions/README.md) | Module for creation of the Azure Kubernetes Service (AKS) managed identity required for the Cloudera Data Warehouse (CDW) service.|
 | [terraform-azure-cde-permissions](modules/terraform-azure-cde-permissions/README.md) | Module for creation of the Azure managed identity required for the Cloudera Data Engineering (CDE) service.|
 | [terraform-azure-storage-endpoints](modules/terraform-azure-storage-endpoints/README.md) | Module for creation creation of Azure private endpoints between specified storage accounts and VNet subnets.|
+| [terraform-gcp-api-service](modules/terraform-gcp-api-service/README.md) | Module to enable and validate the required GCP API services for Cloudera Data Platform (CDP) Public Cloud deployment. Can either enable APIs or perform a lookup to check they are already enabled.|
 
 Each module contains Terraform resource configuration and example variable definition files.
 
