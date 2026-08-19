@@ -30,6 +30,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_gcp_cdp_api_service"></a> [gcp\_cdp\_api\_service](#module\_gcp\_cdp\_api\_service) | ../terraform-gcp-api-service | n/a |
 | <a name="module_gcp_cdp_vpc"></a> [gcp\_cdp\_vpc](#module\_gcp\_cdp\_vpc) | ./modules/vpc | n/a |
 
 ## Resources
@@ -72,6 +73,9 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 |------|-------------|------|---------|:--------:|
 | <a name="input_deployment_template"></a> [deployment\_template](#input\_deployment\_template) | Deployment Pattern to use for Cloud resources and CDP | `string` | n/a | yes |
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | Shorthand name for the environment. Used in resource descriptions | `string` | n/a | yes |
+| <a name="input_api_services"></a> [api\_services](#input\_api\_services) | List of GCP API services to enable or check. Defaults to the APIs required for Cloudera CDP deployment. | `list(string)` | <pre>[<br/>  "compute.googleapis.com",<br/>  "iam.googleapis.com",<br/>  "iamcredentials.googleapis.com",<br/>  "servicenetworking.googleapis.com",<br/>  "sqladmin.googleapis.com",<br/>  "storage.googleapis.com"<br/>]</pre> | no |
+| <a name="input_api_services_disable_dependent_services"></a> [api\_services\_disable\_dependent\_services](#input\_api\_services\_disable\_dependent\_services) | Flag to control whether services that are enabled and which depend on the service being disabled should also be disabled when the resource is destroyed. Only relevant if api\_services\_disable\_on\_destroy is true. | `bool` | `false` | no |
+| <a name="input_api_services_disable_on_destroy"></a> [api\_services\_disable\_on\_destroy](#input\_api\_services\_disable\_on\_destroy) | Flag to control whether the API services should be disabled when the resource is destroyed. Defaults to false to avoid accidentally breaking other services in the project. | `bool` | `false` | no |
 | <a name="input_backup_storage_bucket"></a> [backup\_storage\_bucket](#input\_backup\_storage\_bucket) | Optional Backup location for CDP environment. | `string` | `null` | no |
 | <a name="input_bucket_public_access_prevention"></a> [bucket\_public\_access\_prevention](#input\_bucket\_public\_access\_prevention) | Controls public access to GCS bucket. Acceptable values are inherited or enforced. | `string` | `"enforced"` | no |
 | <a name="input_bucket_storage_class"></a> [bucket\_storage\_class](#input\_bucket\_storage\_class) | The GCS storage class to use for the data, log and backup storage | `string` | `"NEARLINE"` | no |
@@ -88,6 +92,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="input_datalake_admin_custom_role_name"></a> [datalake\_admin\_custom\_role\_name](#input\_datalake\_admin\_custom\_role\_name) | Name of Ranger Audit and Datalake Admin Custom Role | `string` | `null` | no |
 | <a name="input_datalake_admin_role_permissions"></a> [datalake\_admin\_role\_permissions](#input\_datalake\_admin\_role\_permissions) | List of Permission Assignments to the Ranger Audit and Datalake Admin Custom Role | `list(string)` | <pre>[<br/>  "storage.buckets.get",<br/>  "storage.objects.create",<br/>  "storage.objects.delete",<br/>  "storage.objects.get",<br/>  "storage.objects.list",<br/>  "storage.hmacKeys.create",<br/>  "storage.hmacKeys.delete",<br/>  "storage.hmacKeys.get",<br/>  "storage.hmacKeys.list",<br/>  "storage.hmacKeys.update"<br/>]</pre> | no |
 | <a name="input_datalake_admin_service_account_name"></a> [datalake\_admin\_service\_account\_name](#input\_datalake\_admin\_service\_account\_name) | Datalake Admin service account name | `string` | `null` | no |
+| <a name="input_enable_apis"></a> [enable\_apis](#input\_enable\_apis) | Flag to specify if the GCP APIs should be enabled. When false (default) only a data source lookup is performed to check if the APIs are already enabled. | `bool` | `false` | no |
 | <a name="input_firewall_default_name"></a> [firewall\_default\_name](#input\_firewall\_default\_name) | Name of Default Firewall for CDP environment | `string` | `null` | no |
 | <a name="input_firewall_internal_name"></a> [firewall\_internal\_name](#input\_firewall\_internal\_name) | Name of Firewall for Internal Virtual Network communication | `string` | `null` | no |
 | <a name="input_firewall_knox_name"></a> [firewall\_knox\_name](#input\_firewall\_knox\_name) | Name of Knox Firewall for CDP environment | `string` | `null` | no |
