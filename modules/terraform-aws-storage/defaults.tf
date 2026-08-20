@@ -14,11 +14,22 @@
 
 locals {
 
-  # Fully qualified bucket names (with suffix)
-  data_bucket_name   = "${var.data_storage_bucket}${var.storage_suffix}"
-  log_bucket_name    = "${var.log_storage_bucket}${var.storage_suffix}"
-  backup_bucket_name = "${var.backup_storage_bucket}${var.storage_suffix}"
+  # Deduplicated set of bucket names to create
+  buckets_to_create = toset([for name in [
+    var.create_data_storage ? var.data_storage_bucket : null,
+    var.create_log_storage ? var.log_storage_bucket : null,
+    var.create_backup_storage ? var.backup_storage_bucket : null,
+  ] : name if name != null])
 
-  # Deduplicated set of bucket base names for resource creation
-  unique_buckets = toset([var.data_storage_bucket, var.log_storage_bucket, var.backup_storage_bucket])
+  # Deduplicated set of existing bucket names to look up
+  buckets_to_lookup = toset([for name in [
+    var.create_data_storage ? null : var.existing_data_storage_bucket,
+    var.create_log_storage ? null : var.existing_log_storage_bucket,
+    var.create_backup_storage ? null : var.existing_backup_storage_bucket,
+  ] : name if name != null])
+
+  # Fully qualified bucket names per role (consistent regardless of create/reuse)
+  data_bucket_name   = var.create_data_storage ? "${var.data_storage_bucket}${var.storage_suffix}" : var.existing_data_storage_bucket
+  log_bucket_name    = var.create_log_storage ? "${var.log_storage_bucket}${var.storage_suffix}" : var.existing_log_storage_bucket
+  backup_bucket_name = var.create_backup_storage ? "${var.backup_storage_bucket}${var.storage_suffix}" : var.existing_backup_storage_bucket
 }

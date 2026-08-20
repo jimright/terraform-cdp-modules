@@ -29,12 +29,20 @@ output "aws_data_storage_location" {
 }
 
 output "aws_data_storage_bucket_arn" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.data_storage_bucket].arn
+  value = (
+    var.create_data_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.data_storage_bucket].arn
+    : data.aws_s3_bucket.existing_storage[var.existing_data_storage_bucket].arn
+  )
   description = "AWS data storage bucket ARN"
 }
 
 output "aws_data_storage_bucket_id" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.data_storage_bucket].id
+  value = (
+    var.create_data_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.data_storage_bucket].id
+    : data.aws_s3_bucket.existing_storage[var.existing_data_storage_bucket].id
+  )
   description = "AWS data storage bucket ID"
 }
 
@@ -55,12 +63,20 @@ output "aws_log_storage_location" {
 }
 
 output "aws_log_storage_bucket_arn" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.log_storage_bucket].arn
+  value = (
+    var.create_log_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.log_storage_bucket].arn
+    : data.aws_s3_bucket.existing_storage[var.existing_log_storage_bucket].arn
+  )
   description = "AWS log storage bucket ARN"
 }
 
 output "aws_log_storage_bucket_id" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.log_storage_bucket].id
+  value = (
+    var.create_log_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.log_storage_bucket].id
+    : data.aws_s3_bucket.existing_storage[var.existing_log_storage_bucket].id
+  )
   description = "AWS log storage bucket ID"
 }
 
@@ -81,11 +97,19 @@ output "aws_backup_storage_location" {
 }
 
 output "aws_backup_storage_bucket_arn" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.backup_storage_bucket].arn
+  value = (
+    var.create_backup_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.backup_storage_bucket].arn
+    : data.aws_s3_bucket.existing_storage[var.existing_backup_storage_bucket].arn
+  )
   description = "AWS backup storage bucket ARN"
 }
 
 output "aws_backup_storage_bucket_id" {
-  value       = aws_s3_bucket.cdp_storage_locations[var.backup_storage_bucket].id
+  value = (
+    var.create_backup_storage
+    ? aws_s3_bucket.cdp_storage_locations[var.backup_storage_bucket].id
+    : data.aws_s3_bucket.existing_storage[var.existing_backup_storage_bucket].id
+  )
   description = "AWS backup storage bucket ID"
 }
