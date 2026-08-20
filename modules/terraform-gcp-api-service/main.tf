@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ------- Enable GCP API Services -------
+resource "google_project_service" "cdp_api_service" {
 
-# Retrieve project details
-data "google_project" "project" {}
+  for_each = var.enable_apis ? toset(var.api_services) : toset([])
+
+  project = data.google_project.project.project_id
+  service = each.value
+
+  disable_on_destroy         = var.disable_on_destroy
+  disable_dependent_services = var.disable_dependent_services
+}

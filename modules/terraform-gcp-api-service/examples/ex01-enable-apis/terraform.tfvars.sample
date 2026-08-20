@@ -1,0 +1,2 @@
+# ------- GCP Settings -------
+gcp_project = "<ENTER_GCP_PROJECT_NAME>"

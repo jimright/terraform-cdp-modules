@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# Retrieve project details
-data "google_project" "project" {}
+output "api_service_status" {
+  description = "Map of GCP API service names to their details. A successful lookup confirms the API is enabled."
+  value = {
+    for service, details in data.google_project_service.cdp_api_service :
+    service => {
+      project                    = details.project
+      service                    = details.service
+      disable_dependent_services = details.disable_dependent_services
+    }
+  }
+}

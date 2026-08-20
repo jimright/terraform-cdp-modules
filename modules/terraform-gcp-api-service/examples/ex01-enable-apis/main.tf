@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+provider "google" {
+  project = var.gcp_project
+}
 
-# Retrieve project details
-data "google_project" "project" {}
+
+module "gcp_api_service" {
+  source = "../.."
+
+  enable_apis = true
+}

@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2026 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# ------- GCP API Services -------
+module "gcp_cdp_api_service" {
+
+  source = "../terraform-gcp-api-service"
+
+  enable_apis                = var.enable_apis
+  api_services               = var.api_services
+  disable_on_destroy         = var.api_services_disable_on_destroy
+  disable_dependent_services = var.api_services_disable_dependent_services
+}
 
 # ------- VPC -------
 # Create the VNet & subnets if required

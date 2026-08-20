@@ -12,6 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# Retrieve project details
+# ------- Retrieve project details -------
 data "google_project" "project" {}
+
+# ------- Lookup GCP API Service Status -------
+data "google_project_service" "cdp_api_service" {
+
+  for_each = toset(var.api_services)
+
+  project = data.google_project.project.project_id
+  service = each.value
+
+  depends_on = [google_project_service.cdp_api_service]
+
+  lifecycle {
+    postcondition {
+      condition     = self.id != null
+      error_message = "GCP API service '${each.value}' is not enabled in project '${data.google_project.project.project_id}'. Enable it or set enable_apis = true."
+    }
+  }
+}

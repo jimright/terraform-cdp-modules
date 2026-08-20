@@ -1,4 +1,4 @@
-# Copyright 2026 Cloudera, Inc. All Rights Reserved.
+# Copyright 2023 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# Retrieve project details
-data "google_project" "project" {}
+# ------- Global settings -------
+variable "gcp_project" {
+  type        = string
+  description = "Region which Cloud resources will be created"
+}

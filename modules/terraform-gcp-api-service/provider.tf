@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 6.12"
+    }
+  }
 
-# Retrieve project details
-data "google_project" "project" {}
+  required_version = ">= 1.3.0"
+}
