@@ -90,9 +90,9 @@ locals {
 
   raz_storage_role_assignments = flatten([
 
-    for k, v in azurerm_storage_account.cdp_storage_locations : [
+    for k, v in module.azure_cdp_storage.storage_account_ids : [
       for role_assign in var.raz_storage_role_assignments : {
-        scope       = v.id
+        scope       = v
         role        = role_assign.role,
         description = role_assign.description
       }

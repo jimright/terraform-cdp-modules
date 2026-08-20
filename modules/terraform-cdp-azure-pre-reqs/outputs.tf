@@ -90,61 +90,57 @@ output "azure_security_group_knox_uri" {
 }
 
 output "azure_data_storage_account" {
-  value = azurerm_storage_account.cdp_storage_locations[local.data_storage.data_storage_bucket].name
+  value = module.azure_cdp_storage.azure_data_storage_account
 
   description = "Azure data storage account name"
 }
 
 output "azure_data_storage_container" {
-  value = azurerm_storage_container.cdp_data_storage.name
+  value = module.azure_cdp_storage.azure_data_storage_container
 
   description = "Azure data storage container name"
 }
 
 output "azure_data_storage_location" {
-  value = "abfs://${azurerm_storage_container.cdp_data_storage.name}@${azurerm_storage_account.cdp_storage_locations[local.data_storage.data_storage_bucket].name}.dfs.core.windows.net"
+  value = module.azure_cdp_storage.azure_data_storage_location
 
   description = "Azure data storage location"
-
 }
 
 output "azure_log_storage_account" {
-  value = azurerm_storage_account.cdp_storage_locations[local.log_storage.log_storage_bucket].name
+  value = module.azure_cdp_storage.azure_log_storage_account
 
   description = "Azure log storage account name"
 }
 
 output "azure_log_storage_container" {
-  value = azurerm_storage_container.cdp_log_storage.name
+  value = module.azure_cdp_storage.azure_log_storage_container
 
   description = "Azure log storage container name"
 }
 
 output "azure_log_storage_location" {
-  value = "abfs://${azurerm_storage_container.cdp_log_storage.name}@${azurerm_storage_account.cdp_storage_locations[local.log_storage.log_storage_bucket].name}.dfs.core.windows.net"
+  value = module.azure_cdp_storage.azure_log_storage_location
 
   description = "Azure log storage location"
-
 }
 
 output "azure_backup_storage_account" {
-  value = azurerm_storage_account.cdp_storage_locations[local.backup_storage.backup_storage_bucket].name
+  value = module.azure_cdp_storage.azure_backup_storage_account
 
   description = "Azure backup storage account name"
 }
 
 output "azure_backup_storage_container" {
-  value = azurerm_storage_container.cdp_backup_storage.name
+  value = module.azure_cdp_storage.azure_backup_storage_container
 
   description = "Azure backup storage container name"
 }
 
 output "azure_backup_storage_location" {
-  value = "abfs://${azurerm_storage_container.cdp_backup_storage.name}@${azurerm_storage_account.cdp_storage_locations[local.backup_storage.backup_storage_bucket].name}.dfs.core.windows.net"
-
+  value = module.azure_cdp_storage.azure_backup_storage_location
 
   description = "Azure backup storage location"
-
 }
 
 output "azure_xaccount_app_uuid" {

@@ -124,37 +124,39 @@ resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-resource "azurerm_storage_account" "cdp_storage_locations" {
-  # Create buckets for the unique list of buckets in data and log storage
-  for_each = toset(concat([local.data_storage.data_storage_bucket], [local.log_storage.log_storage_bucket], [
-    local.backup_storage.backup_storage_bucket
-  ]))
+module "azure_cdp_storage" {
+  source = "../terraform-azure-storage"
 
-  name                = "${each.value}${local.storage_suffix}"
+  create_data_storage   = var.create_data_storage
+  create_log_storage    = var.create_log_storage
+  create_backup_storage = var.create_backup_storage
+
+  data_storage_account     = local.data_storage.data_storage_bucket
+  data_storage_container   = local.data_storage.data_storage_object
+  log_storage_account      = local.log_storage.log_storage_bucket
+  log_storage_container    = local.log_storage.log_storage_object
+  backup_storage_account   = local.backup_storage.backup_storage_bucket
+  backup_storage_container = local.backup_storage.backup_storage_object
+
+  existing_data_storage_account     = var.existing_data_storage_account
+  existing_data_storage_container   = var.existing_data_storage_container
+  existing_log_storage_account      = var.existing_log_storage_account
+  existing_log_storage_container    = var.existing_log_storage_container
+  existing_backup_storage_account   = var.existing_backup_storage_account
+  existing_backup_storage_container = var.existing_backup_storage_container
+
   resource_group_name = module.azure_cdp_rmgp.resource_group_name
   location            = module.azure_cdp_rmgp.resource_group_location
 
+  storage_suffix = local.storage_suffix
+
   public_network_access_enabled = var.storage_public_network_access_enabled
 
-  # TODO: Review and parameterize these options
-  account_kind             = "StorageV2"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  is_hns_enabled           = true
+  create_network_rules     = var.create_azure_storage_network_rules
+  network_rules_ip_rules   = [for cdr in var.ingress_extra_cidrs_and_ports.cidrs : can(regex("^[\\d.]{4}:/31|/32$", cdr)) ? replace(cdr, "/^([\\d.]{4}):/31|/32$/", "$1") : cdr]
+  network_rules_subnet_ids = module.azure_cdp_vnet.vnet_cdp_subnet_ids
 
-  tags = merge(local.env_tags, { Name = "${each.value}${local.storage_suffix}" })
-}
-
-resource "azurerm_storage_account_network_rules" "cdp_storage_access_rules" {
-
-  for_each = { for k, v in azurerm_storage_account.cdp_storage_locations : k => v
-  if var.create_azure_storage_network_rules }
-
-  storage_account_id         = each.value.id
-  default_action             = "Deny"
-  ip_rules                   = [for cdr in var.ingress_extra_cidrs_and_ports.cidrs : can(regex("^[\\d.]{4}:/31|/32$", cdr)) ? replace(cdr, "/^([\\d.]{4}):/31|/32$/", "$1") : cdr]
-  bypass                     = ["AzureServices"]
-  virtual_network_subnet_ids = module.azure_cdp_vnet.vnet_cdp_subnet_ids
+  tags = local.env_tags
 }
 
 # ------- Azure Private endpoints for Storage Accounts -------
@@ -168,50 +170,13 @@ module "stor_private_endpoints" {
   vnet_name          = local.cdp_vnet_name
 
   private_endpoint_prefix              = var.env_prefix
-  private_endpoint_storage_account_ids = values(azurerm_storage_account.cdp_storage_locations)[*].id
+  private_endpoint_storage_account_ids = values(module.azure_cdp_storage.storage_account_ids)
   private_endpoint_target_subnet_ids   = module.azure_cdp_vnet.vnet_cdp_subnet_ids
 
   tags = var.env_tags
 
   depends_on = [module.azure_cdp_vnet,
-    azurerm_storage_account_network_rules.cdp_storage_access_rules
-  ]
-}
-
-# ------- Azure Storage Containers -------
-# Data Storage Objects
-resource "azurerm_storage_container" "cdp_data_storage" {
-
-  name                  = local.data_storage.data_storage_object
-  storage_account_id    = azurerm_storage_account.cdp_storage_locations[local.data_storage.data_storage_bucket].id
-  container_access_type = "private"
-
-  depends_on = [
-    azurerm_storage_account.cdp_storage_locations
-  ]
-}
-
-# Log Storage Objects
-resource "azurerm_storage_container" "cdp_log_storage" {
-
-  name                  = local.log_storage.log_storage_object
-  storage_account_id    = azurerm_storage_account.cdp_storage_locations[local.log_storage.log_storage_bucket].id
-  container_access_type = "private"
-
-  depends_on = [
-    azurerm_storage_account.cdp_storage_locations
-  ]
-}
-
-# Backup Storage Object
-resource "azurerm_storage_container" "cdp_backup_storage" {
-
-  name                  = local.backup_storage.backup_storage_object
-  storage_account_id    = azurerm_storage_account.cdp_storage_locations[local.backup_storage.backup_storage_bucket].id
-  container_access_type = "private"
-
-  depends_on = [
-    azurerm_storage_account.cdp_storage_locations
+    module.azure_cdp_storage
   ]
 }
 
@@ -268,9 +233,9 @@ module "azure_cloudera_permissions" {
   datalake_admin_log_container_role_assignments    = var.datalake_admin_log_container_role_assignments
   datalake_admin_backup_container_role_assignments = var.datalake_admin_backup_container_role_assignments
 
-  data_storage_container_id   = azurerm_storage_container.cdp_data_storage.id
-  log_storage_container_id    = azurerm_storage_container.cdp_log_storage.id
-  backup_storage_container_id = azurerm_storage_container.cdp_backup_storage.id
+  data_storage_container_id   = module.azure_cdp_storage.azure_data_storage_container_id
+  log_storage_container_id    = module.azure_cdp_storage.azure_log_storage_container_id
+  backup_storage_container_id = module.azure_cdp_storage.azure_backup_storage_container_id
 
   log_data_access_managed_identity_name = local.log_data_access_managed_identity_name
   log_data_access_role_assignments      = var.log_data_access_role_assignments
@@ -283,7 +248,7 @@ module "azure_cloudera_permissions" {
   enable_raz                   = var.enable_raz
   raz_managed_identity_name    = local.raz_managed_identity_name
   raz_storage_role_assignments = local.raz_storage_role_assignments
-  data_storage_account_id      = azurerm_storage_account.cdp_storage_locations[local.data_storage.data_storage_bucket].id
+  data_storage_account_id      = module.azure_cdp_storage.azure_data_storage_account_id
 
   tags = local.env_tags
 }

@@ -760,6 +760,70 @@ variable "nfs_file_share_size" {
   default     = 100
 }
 
+# ------- Support for existing Storage resources -------
+variable "create_data_storage" {
+  type        = bool
+  description = "Create a new storage account for data storage. When false, existing_data_storage_account and existing_data_storage_container must be provided."
+
+  default = true
+}
+
+variable "create_log_storage" {
+  type        = bool
+  description = "Create a new storage account for log storage. When false, existing_log_storage_account and existing_log_storage_container must be provided."
+
+  default = true
+}
+
+variable "create_backup_storage" {
+  type        = bool
+  description = "Create a new storage account for backup storage. When false, existing_backup_storage_account and existing_backup_storage_container must be provided."
+
+  default = true
+}
+
+variable "existing_data_storage_account" {
+  type        = string
+  description = "Name of an existing storage account for data storage. Required when create_data_storage is false."
+
+  default = null
+}
+
+variable "existing_data_storage_container" {
+  type        = string
+  description = "Name of an existing container for data storage. Required when create_data_storage is false."
+
+  default = null
+}
+
+variable "existing_log_storage_account" {
+  type        = string
+  description = "Name of an existing storage account for log storage. Required when create_log_storage is false."
+
+  default = null
+}
+
+variable "existing_log_storage_container" {
+  type        = string
+  description = "Name of an existing container for log storage. Required when create_log_storage is false."
+
+  default = null
+}
+
+variable "existing_backup_storage_account" {
+  type        = string
+  description = "Name of an existing storage account for backup storage. Required when create_backup_storage is false."
+
+  default = null
+}
+
+variable "existing_backup_storage_container" {
+  type        = string
+  description = "Name of an existing container for backup storage. Required when create_backup_storage is false."
+
+  default = null
+}
+
 # ------- Support for existing Authz resources -------
 # Cross Account Application
 variable "existing_xaccount_app_client_id" {

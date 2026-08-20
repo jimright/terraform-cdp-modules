@@ -167,30 +167,6 @@ resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-resource "aws_s3_bucket" "cdp_storage_locations" {
-  # Create buckets for the unique list of buckets in data and log storage
-  for_each = toset(concat([local.data_storage.data_storage_bucket], [local.log_storage.log_storage_bucket], [local.backup_storage.backup_storage_bucket]))
-
-  bucket = "${each.value}${local.storage_suffix}"
-  tags   = merge(local.env_tags, { Name = "${each.value}${local.storage_suffix}" })
-
-  # Purge storage locations during teardown?
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_public_access_block" "cdp_storage_locations" {
-
-  for_each = aws_s3_bucket.cdp_storage_locations
-
-  bucket = each.value.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-}
-
 resource "aws_kms_key" "cdp_kms_key" {
 
   count = var.enable_kms_bucket_encryption ? 1 : 0
@@ -207,71 +183,30 @@ resource "aws_kms_alias" "cdp_kms_alias" {
   target_key_id = aws_kms_key.cdp_kms_key[0].key_id
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "cdp_storage_location_kms" {
+module "aws_cdp_storage" {
 
-  for_each = var.enable_kms_bucket_encryption ? aws_s3_bucket.cdp_storage_locations : {}
+  source = "../terraform-aws-storage"
 
-  bucket = each.value.id
+  create_data_storage   = local.create_data_storage
+  create_log_storage    = local.create_log_storage
+  create_backup_storage = local.create_backup_storage
 
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.cdp_kms_key[0].arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
+  data_storage_bucket   = local.data_storage.data_storage_bucket
+  log_storage_bucket    = local.log_storage.log_storage_bucket
+  backup_storage_bucket = local.backup_storage.backup_storage_bucket
 
-resource "aws_s3_bucket_versioning" "cdp_storage_location_versioning" {
+  data_storage_object   = local.data_storage.data_storage_object
+  log_storage_object    = local.log_storage.log_storage_object
+  backup_storage_object = local.backup_storage.backup_storage_object
 
-  for_each = var.enable_bucket_versioning ? aws_s3_bucket.cdp_storage_locations : {}
+  existing_data_storage_bucket   = var.existing_data_storage_bucket
+  existing_log_storage_bucket    = var.existing_log_storage_bucket
+  existing_backup_storage_bucket = var.existing_backup_storage_bucket
 
-  bucket = each.value.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-
-}
-
-# ------- AWS Buckets directory structures -------
-# # Data Storage Objects
-# NOTE: Removing creation of the data storage object because CDP overrides this
-# resource "aws_s3_object" "cdp_data_storage_object" {
-
-#   bucket = "${local.data_storage.data_storage_bucket}${local.storage_suffix}"
-
-#   key          = local.data_storage.data_storage_object
-#   content_type = "application/x-directory"
-
-#   depends_on = [
-#     aws_s3_bucket.cdp_storage_locations
-#   ]
-# }
-
-# Log Storage Objects
-resource "aws_s3_object" "cdp_log_storage_object" {
-
-  bucket = "${local.log_storage.log_storage_bucket}${local.storage_suffix}"
-
-  key          = local.log_storage.log_storage_object
-  content_type = "application/x-directory"
-
-  depends_on = [
-    aws_s3_bucket.cdp_storage_locations
-  ]
-}
-
-# Backup Storage Object
-resource "aws_s3_object" "cdp_backup_storage_object" {
-
-  bucket = "${local.backup_storage.backup_storage_bucket}${local.storage_suffix}"
-
-  key          = local.backup_storage.backup_storage_object
-  content_type = "application/x-directory"
-
-  depends_on = [
-    aws_s3_bucket.cdp_storage_locations
-  ]
+  storage_suffix           = local.storage_suffix
+  tags                     = local.env_tags
+  kms_key_arn              = var.enable_kms_bucket_encryption ? aws_kms_key.cdp_kms_key[0].arn : null
+  enable_bucket_versioning = var.enable_bucket_versioning
 }
 
 # ------- Credential Permissions - Cross Account Role -------
@@ -319,13 +254,13 @@ module "aws_cdp_permissions" {
   backup_bucket_access_policy_name = local.backup_bucket_access_policy_name
   backup_bucket_access_policy_doc  = var.backup_bucket_access_policy_doc
 
-  data_storage_bucket   = "${local.data_storage.data_storage_bucket}${local.storage_suffix}"
-  log_storage_bucket    = "${local.log_storage.log_storage_bucket}${local.storage_suffix}"
-  backup_storage_bucket = "${local.backup_storage.backup_storage_bucket}${local.storage_suffix}"
+  data_storage_bucket   = module.aws_cdp_storage.aws_data_storage_bucket
+  log_storage_bucket    = module.aws_cdp_storage.aws_log_storage_bucket
+  backup_storage_bucket = module.aws_cdp_storage.aws_backup_storage_bucket
 
-  storage_location_base = "${local.data_storage.data_storage_bucket}${local.storage_suffix}/${replace(local.data_storage.data_storage_object, "/", "")}"
-  log_location_base     = "${local.log_storage.log_storage_bucket}${local.storage_suffix}/${replace(local.log_storage.log_storage_object, "/", "")}"
-  backup_location_base  = "${local.backup_storage.backup_storage_bucket}${local.storage_suffix}/${replace(local.backup_storage.backup_storage_object, "/", "")}"
+  storage_location_base = "${module.aws_cdp_storage.aws_data_storage_bucket}/${replace(module.aws_cdp_storage.aws_data_storage_object, "/", "")}"
+  log_location_base     = "${module.aws_cdp_storage.aws_log_storage_bucket}/${replace(module.aws_cdp_storage.aws_log_storage_object, "/", "")}"
+  backup_location_base  = "${module.aws_cdp_storage.aws_backup_storage_bucket}/${replace(module.aws_cdp_storage.aws_backup_storage_object, "/", "")}"
 
   datalake_backup_policy_name  = local.datalake_backup_policy_name
   datalake_backup_policy_doc   = var.datalake_backup_policy_doc
@@ -337,5 +272,5 @@ module "aws_cdp_permissions" {
   datalake_admin_role_name = local.datalake_admin_role_name
   ranger_audit_role_name   = local.ranger_audit_role_name
 
-  depends_on = [aws_s3_bucket.cdp_storage_locations]
+  depends_on = [module.aws_cdp_storage]
 }

@@ -38,6 +38,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="module_aws_cdp_cred_permissions"></a> [aws\_cdp\_cred\_permissions](#module\_aws\_cdp\_cred\_permissions) | ../terraform-aws-cred-permissions | n/a |
 | <a name="module_aws_cdp_ingress"></a> [aws\_cdp\_ingress](#module\_aws\_cdp\_ingress) | ../terraform-aws-ingress | n/a |
 | <a name="module_aws_cdp_permissions"></a> [aws\_cdp\_permissions](#module\_aws\_cdp\_permissions) | ../terraform-aws-permissions | n/a |
+| <a name="module_aws_cdp_storage"></a> [aws\_cdp\_storage](#module\_aws\_cdp\_storage) | ../terraform-aws-storage | n/a |
 | <a name="module_aws_cdp_vpc"></a> [aws\_cdp\_vpc](#module\_aws\_cdp\_vpc) | ../terraform-aws-vpc | n/a |
 
 ## Resources
@@ -46,12 +47,6 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 |------|------|
 | [aws_kms_alias.cdp_kms_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.cdp_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
-| [aws_s3_bucket.cdp_storage_locations](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
-| [aws_s3_bucket_public_access_block.cdp_storage_locations](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
-| [aws_s3_bucket_server_side_encryption_configuration.cdp_storage_location_kms](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
-| [aws_s3_bucket_versioning.cdp_storage_location_versioning](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
-| [aws_s3_object.cdp_backup_storage_object](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
-| [aws_s3_object.cdp_log_storage_object](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
 | [aws_security_group.cdp_endpoint_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group_rule.cdp_endpoint_ingress_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.cdp_endpoint_sg_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
@@ -101,8 +96,11 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="input_enable_bucket_versioning"></a> [enable\_bucket\_versioning](#input\_enable\_bucket\_versioning) | Flag to enable versioning of S3 buckets. | `bool` | `false` | no |
 | <a name="input_enable_kms_bucket_encryption"></a> [enable\_kms\_bucket\_encryption](#input\_enable\_kms\_bucket\_encryption) | Flag to create AWS KMS for encryption of S3 buckets. Currently disabled as further settings needed for successful CDP deployment. | `bool` | `false` | no |
 | <a name="input_env_tags"></a> [env\_tags](#input\_env\_tags) | Tags applied to provised resources | `map(any)` | `null` | no |
+| <a name="input_existing_backup_storage_bucket"></a> [existing\_backup\_storage\_bucket](#input\_existing\_backup\_storage\_bucket) | Name of an existing S3 bucket for backup storage. If set then no backup storage bucket is created. Must be set explicitly — there is no implicit fallback to existing\_data\_storage\_bucket. | `string` | `null` | no |
+| <a name="input_existing_data_storage_bucket"></a> [existing\_data\_storage\_bucket](#input\_existing\_data\_storage\_bucket) | Name of an existing S3 bucket for data storage. If set then no data storage bucket is created. Each storage role (data, log, backup) is controlled independently — setting this variable does NOT affect log or backup bucket creation. | `string` | `null` | no |
 | <a name="input_existing_default_security_group_name"></a> [existing\_default\_security\_group\_name](#input\_existing\_default\_security\_group\_name) | Name of existing Default Security Group for Cloudera on cloud environment. If set then no security group or ingress rules are created for the Default SG. | `string` | `null` | no |
 | <a name="input_existing_knox_security_group_name"></a> [existing\_knox\_security\_group\_name](#input\_existing\_knox\_security\_group\_name) | Name of existing Knox Security Group for Cloudera on cloud environment. If set then no security group or ingress rules are created for the Knox SG. | `string` | `null` | no |
+| <a name="input_existing_log_storage_bucket"></a> [existing\_log\_storage\_bucket](#input\_existing\_log\_storage\_bucket) | Name of an existing S3 bucket for log storage. If set then no log storage bucket is created. Must be set explicitly — there is no implicit fallback to existing\_data\_storage\_bucket. | `string` | `null` | no |
 | <a name="input_existing_xaccount_role_name"></a> [existing\_xaccount\_role\_name](#input\_existing\_xaccount\_role\_name) | Name of existing CDP Cross Account Role. If set then no Cross Account policy or role resources are created. | `string` | `null` | no |
 | <a name="input_idbroker_policy_name"></a> [idbroker\_policy\_name](#input\_idbroker\_policy\_name) | IDBroker Policy name | `string` | `null` | no |
 | <a name="input_idbroker_role_name"></a> [idbroker\_role\_name](#input\_idbroker\_role\_name) | IDBroker service role Name | `string` | `null` | no |
@@ -141,9 +139,11 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | Name | Description |
 |------|-------------|
 | <a name="output_aws_backup_storage_bucket"></a> [aws\_backup\_storage\_bucket](#output\_aws\_backup\_storage\_bucket) | AWS backup storage bucket |
+| <a name="output_aws_backup_storage_bucket_arn"></a> [aws\_backup\_storage\_bucket\_arn](#output\_aws\_backup\_storage\_bucket\_arn) | AWS backup storage bucket ARN |
 | <a name="output_aws_backup_storage_location"></a> [aws\_backup\_storage\_location](#output\_aws\_backup\_storage\_location) | AWS backup storage location |
 | <a name="output_aws_backup_storage_object"></a> [aws\_backup\_storage\_object](#output\_aws\_backup\_storage\_object) | AWS backup storage object |
 | <a name="output_aws_data_storage_bucket"></a> [aws\_data\_storage\_bucket](#output\_aws\_data\_storage\_bucket) | AWS data storage bucket |
+| <a name="output_aws_data_storage_bucket_arn"></a> [aws\_data\_storage\_bucket\_arn](#output\_aws\_data\_storage\_bucket\_arn) | AWS data storage bucket ARN |
 | <a name="output_aws_data_storage_location"></a> [aws\_data\_storage\_location](#output\_aws\_data\_storage\_location) | AWS data storage location |
 | <a name="output_aws_data_storage_object"></a> [aws\_data\_storage\_object](#output\_aws\_data\_storage\_object) | AWS data storage object |
 | <a name="output_aws_datalake_admin_role_arn"></a> [aws\_datalake\_admin\_role\_arn](#output\_aws\_datalake\_admin\_role\_arn) | Datalake Admin role ARN |
@@ -154,6 +154,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="output_aws_log_instance_profile_arn"></a> [aws\_log\_instance\_profile\_arn](#output\_aws\_log\_instance\_profile\_arn) | Log instance profile ARN |
 | <a name="output_aws_log_role_name"></a> [aws\_log\_role\_name](#output\_aws\_log\_role\_name) | Log role Name |
 | <a name="output_aws_log_storage_bucket"></a> [aws\_log\_storage\_bucket](#output\_aws\_log\_storage\_bucket) | AWS log storage bucket |
+| <a name="output_aws_log_storage_bucket_arn"></a> [aws\_log\_storage\_bucket\_arn](#output\_aws\_log\_storage\_bucket\_arn) | AWS log storage bucket ARN |
 | <a name="output_aws_log_storage_location"></a> [aws\_log\_storage\_location](#output\_aws\_log\_storage\_location) | AWS log storage location |
 | <a name="output_aws_log_storage_object"></a> [aws\_log\_storage\_object](#output\_aws\_log\_storage\_object) | AWS log storage object |
 | <a name="output_aws_private_route_table_ids"></a> [aws\_private\_route\_table\_ids](#output\_aws\_private\_route\_table\_ids) | AWS private route table IDs |
