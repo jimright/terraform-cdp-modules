@@ -13,16 +13,16 @@
 # limitations under the License.
 
 output "aws_data_storage_location" {
-  value = module.aws_storage.aws_data_storage_location
+  value       = module.aws_storage.aws_data_storage_location
   description = "AWS data storage location (s3a:// URI)"
 }
 
 output "aws_log_storage_location" {
-  value = module.aws_storage.aws_log_storage_location
+  value       = module.aws_storage.aws_log_storage_location
   description = "AWS log storage location (s3a:// URI)"
 }
 
 output "aws_backup_storage_location" {
-  value = module.aws_storage.aws_backup_storage_location
+  value       = module.aws_storage.aws_backup_storage_location
   description = "AWS backup storage location (s3a:// URI)"
 }
