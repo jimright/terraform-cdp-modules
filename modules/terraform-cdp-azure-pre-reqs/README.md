@@ -35,6 +35,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 |------|--------|---------|
 | <a name="module_azure_cdp_ingress"></a> [azure\_cdp\_ingress](#module\_azure\_cdp\_ingress) | ../terraform-azure-ingress | n/a |
 | <a name="module_azure_cdp_rmgp"></a> [azure\_cdp\_rmgp](#module\_azure\_cdp\_rmgp) | ../terraform-azure-resource-group | n/a |
+| <a name="module_azure_cdp_storage"></a> [azure\_cdp\_storage](#module\_azure\_cdp\_storage) | ../terraform-azure-storage | n/a |
 | <a name="module_azure_cdp_vnet"></a> [azure\_cdp\_vnet](#module\_azure\_cdp\_vnet) | ../terraform-azure-vnet | n/a |
 | <a name="module_azure_cloudera_cred_permissions"></a> [azure\_cloudera\_cred\_permissions](#module\_azure\_cloudera\_cred\_permissions) | ../terraform-azure-cred-permissions | n/a |
 | <a name="module_azure_cloudera_permissions"></a> [azure\_cloudera\_permissions](#module\_azure\_cloudera\_permissions) | ../terraform-azure-permissions | n/a |
@@ -48,11 +49,6 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 |------|------|
 | [azurerm_private_dns_zone.flexible_server_dns_zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.flexible_server_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
-| [azurerm_storage_account.cdp_storage_locations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
-| [azurerm_storage_account_network_rules.cdp_storage_access_rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) | resource |
-| [azurerm_storage_container.cdp_backup_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
-| [azurerm_storage_container.cdp_data_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
-| [azurerm_storage_container.cdp_log_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [random_id.bucket_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
 
@@ -75,8 +71,11 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="input_create_azure_cml_nfs"></a> [create\_azure\_cml\_nfs](#input\_create\_azure\_cml\_nfs) | Whether to create NFS for CML | `bool` | `false` | no |
 | <a name="input_create_azure_storage_network_rules"></a> [create\_azure\_storage\_network\_rules](#input\_create\_azure\_storage\_network\_rules) | Enable creation of network rules for the Azure Storage Accounts. | `bool` | `false` | no |
 | <a name="input_create_azure_storage_private_endpoints"></a> [create\_azure\_storage\_private\_endpoints](#input\_create\_azure\_storage\_private\_endpoints) | Flag to specify if Private Endpoints are created for each storage account. | `bool` | `true` | no |
+| <a name="input_create_backup_storage"></a> [create\_backup\_storage](#input\_create\_backup\_storage) | Create a new storage account for backup storage. When false, existing\_backup\_storage\_account and existing\_backup\_storage\_container must be provided. | `bool` | `true` | no |
 | <a name="input_create_cdp_resource_group"></a> [create\_cdp\_resource\_group](#input\_create\_cdp\_resource\_group) | Flag to specify if the Resource Group for Cloudera Resources should be created | `bool` | `true` | no |
+| <a name="input_create_data_storage"></a> [create\_data\_storage](#input\_create\_data\_storage) | Create a new storage account for data storage. When false, existing\_data\_storage\_account and existing\_data\_storage\_container must be provided. | `bool` | `true` | no |
 | <a name="input_create_delegated_subnet"></a> [create\_delegated\_subnet](#input\_create\_delegated\_subnet) | Flag to specify if the delegated subnet should be created. Only applicable if create\_vnet is true. | `bool` | `false` | no |
+| <a name="input_create_log_storage"></a> [create\_log\_storage](#input\_create\_log\_storage) | Create a new storage account for log storage. When false, existing\_log\_storage\_account and existing\_log\_storage\_container must be provided. | `bool` | `true` | no |
 | <a name="input_create_nat_gateway"></a> [create\_nat\_gateway](#input\_create\_nat\_gateway) | Flag to specify if the NAT Gateway should be created. Only applicable if create\_vnet is true. | `bool` | `true` | no |
 | <a name="input_create_network_resource_group"></a> [create\_network\_resource\_group](#input\_create\_network\_resource\_group) | Flag to specify if the Resource Group for Network Resources should be created. Note that if create\_vnet is false this must be false. Note that if separate\_network\_resource\_group is false this will not be used. | `bool` | `true` | no |
 | <a name="input_create_private_flexible_server_resources"></a> [create\_private\_flexible\_server\_resources](#input\_create\_private\_flexible\_server\_resources) | Flag to specify if resources to support a Private Postgres flexible server should be created. | `bool` | `null` | no |
@@ -90,8 +89,14 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 | <a name="input_delegated_subnet_range"></a> [delegated\_subnet\_range](#input\_delegated\_subnet\_range) | Size of each Postgres Flexible Server delegated subnet. Required if create\_vnet is true. | `number` | `26` | no |
 | <a name="input_enable_raz"></a> [enable\_raz](#input\_enable\_raz) | Flag to enable Ranger Authorization Service (RAZ) | `bool` | `true` | no |
 | <a name="input_env_tags"></a> [env\_tags](#input\_env\_tags) | Tags applied to provisioned resources | `map(any)` | `null` | no |
+| <a name="input_existing_backup_storage_account"></a> [existing\_backup\_storage\_account](#input\_existing\_backup\_storage\_account) | Name of an existing storage account for backup storage. Required when create\_backup\_storage is false. | `string` | `null` | no |
+| <a name="input_existing_backup_storage_container"></a> [existing\_backup\_storage\_container](#input\_existing\_backup\_storage\_container) | Name of an existing container for backup storage. Required when create\_backup\_storage is false. | `string` | `null` | no |
+| <a name="input_existing_data_storage_account"></a> [existing\_data\_storage\_account](#input\_existing\_data\_storage\_account) | Name of an existing storage account for data storage. Required when create\_data\_storage is false. | `string` | `null` | no |
+| <a name="input_existing_data_storage_container"></a> [existing\_data\_storage\_container](#input\_existing\_data\_storage\_container) | Name of an existing container for data storage. Required when create\_data\_storage is false. | `string` | `null` | no |
 | <a name="input_existing_default_security_group_name"></a> [existing\_default\_security\_group\_name](#input\_existing\_default\_security\_group\_name) | Name of existing Default Security Group for Cloudera on cloud environment. If set then no security group or ingress rules are created for the Default SG. | `string` | `null` | no |
 | <a name="input_existing_knox_security_group_name"></a> [existing\_knox\_security\_group\_name](#input\_existing\_knox\_security\_group\_name) | Name of existing Knox Security Group for Cloudera on cloud environment. If set then no security group or ingress rules are created for the Knox SG. | `string` | `null` | no |
+| <a name="input_existing_log_storage_account"></a> [existing\_log\_storage\_account](#input\_existing\_log\_storage\_account) | Name of an existing storage account for log storage. Required when create\_log\_storage is false. | `string` | `null` | no |
+| <a name="input_existing_log_storage_container"></a> [existing\_log\_storage\_container](#input\_existing\_log\_storage\_container) | Name of an existing container for log storage. Required when create\_log\_storage is false. | `string` | `null` | no |
 | <a name="input_existing_xaccount_app_client_id"></a> [existing\_xaccount\_app\_client\_id](#input\_existing\_xaccount\_app\_client\_id) | Client ID of existing Azure AD Application for Cloudera Cross Account. If set then no application or SPN resources are created. | `string` | `null` | no |
 | <a name="input_existing_xaccount_app_pword"></a> [existing\_xaccount\_app\_pword](#input\_existing\_xaccount\_app\_pword) | Password of existing Azure AD Application for Cloudera Cross Account. If set then no application or SPN resources are created. | `string` | `null` | no |
 | <a name="input_gateway_subnet_range"></a> [gateway\_subnet\_range](#input\_gateway\_subnet\_range) | Size of each gateway subnet. Required if create\_vnet is true. | `number` | `24` | no |
