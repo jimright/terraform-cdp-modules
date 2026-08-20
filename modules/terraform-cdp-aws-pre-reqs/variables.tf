@@ -738,3 +738,24 @@ variable "existing_knox_security_group_name" {
   default = null
 }
 
+variable "existing_data_storage_bucket" {
+  type        = string
+  description = "Name of an existing S3 bucket for data storage. If set then no data storage bucket is created. Each storage role (data, log, backup) is controlled independently — setting this variable does NOT affect log or backup bucket creation."
+
+  default = null
+}
+
+variable "existing_log_storage_bucket" {
+  type        = string
+  description = "Name of an existing S3 bucket for log storage. If set then no log storage bucket is created. Must be set explicitly — there is no implicit fallback to existing_data_storage_bucket."
+
+  default = null
+}
+
+variable "existing_backup_storage_bucket" {
+  type        = string
+  description = "Name of an existing S3 bucket for backup storage. If set then no backup storage bucket is created. Must be set explicitly — there is no implicit fallback to existing_data_storage_bucket."
+
+  default = null
+}
+

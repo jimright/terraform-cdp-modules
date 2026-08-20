@@ -57,6 +57,11 @@ locals {
     backup_storage_object = try(var.backup_storage.backup_storage_object, "backups/")
   }
 
+  # Determine create vs reuse for each storage role (explicit per-role, no implicit fallback)
+  create_data_storage   = var.existing_data_storage_bucket == null
+  create_log_storage    = var.existing_log_storage_bucket == null
+  create_backup_storage = var.existing_backup_storage_bucket == null
+
   # ------- Policies -------
   # Cross Account Policy (name and document)
   xaccount_policy_name = coalesce(var.xaccount_policy_name, "${var.env_prefix}-xaccount-policy")
