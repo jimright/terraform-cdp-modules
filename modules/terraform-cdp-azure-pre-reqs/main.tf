@@ -251,6 +251,10 @@ module "azure_cloudera_permissions" {
   data_storage_account_id      = module.azure_cdp_storage.azure_data_storage_account_id
 
   tags = local.env_tags
+
+  depends_on = [
+    module.azure_cdp_storage,
+  ]
 }
 
 module "azure_cml_nfs" {

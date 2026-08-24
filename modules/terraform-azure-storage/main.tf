@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ------- Data Sources for Existing Storage Accounts -------
-data "azurerm_storage_account" "existing_storage" {
-  for_each = local.accounts_to_lookup
-
-  name                = each.value
-  resource_group_name = var.resource_group_name
-}
-
 # ------- Storage Accounts -------
 resource "azurerm_storage_account" "cdp_storage_locations" {
   for_each = local.accounts_to_create
