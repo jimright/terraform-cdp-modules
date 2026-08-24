@@ -25,7 +25,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 5.2.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 
 ## Modules
 
