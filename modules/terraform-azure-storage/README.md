@@ -25,7 +25,7 @@ In each directory an example `terraform.tfvars.sample` values file is included t
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 5.2.0 |
 
 ## Modules
 
@@ -41,6 +41,9 @@ No modules.
 | [azurerm_storage_container.cdp_data_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.cdp_log_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_account.existing_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_account) | data source |
+| [azurerm_storage_container.existing_backup_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_container) | data source |
+| [azurerm_storage_container.existing_data_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_container) | data source |
+| [azurerm_storage_container.existing_log_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_container) | data source |
 
 ## Inputs
 
@@ -83,19 +86,19 @@ No modules.
 | <a name="output_azure_backup_storage_account_id"></a> [azure\_backup\_storage\_account\_id](#output\_azure\_backup\_storage\_account\_id) | Azure backup storage account ID |
 | <a name="output_azure_backup_storage_account_primary_dfs_endpoint"></a> [azure\_backup\_storage\_account\_primary\_dfs\_endpoint](#output\_azure\_backup\_storage\_account\_primary\_dfs\_endpoint) | Azure backup storage account primary DFS endpoint |
 | <a name="output_azure_backup_storage_container"></a> [azure\_backup\_storage\_container](#output\_azure\_backup\_storage\_container) | Azure backup storage container name |
-| <a name="output_azure_backup_storage_container_id"></a> [azure\_backup\_storage\_container\_id](#output\_azure\_backup\_storage\_container\_id) | Azure backup storage container ID (null when reusing existing) |
+| <a name="output_azure_backup_storage_container_id"></a> [azure\_backup\_storage\_container\_id](#output\_azure\_backup\_storage\_container\_id) | Azure backup storage container ID |
 | <a name="output_azure_backup_storage_location"></a> [azure\_backup\_storage\_location](#output\_azure\_backup\_storage\_location) | Azure backup storage location (abfs:// URI) |
 | <a name="output_azure_data_storage_account"></a> [azure\_data\_storage\_account](#output\_azure\_data\_storage\_account) | Azure data storage account name |
 | <a name="output_azure_data_storage_account_id"></a> [azure\_data\_storage\_account\_id](#output\_azure\_data\_storage\_account\_id) | Azure data storage account ID |
 | <a name="output_azure_data_storage_account_primary_dfs_endpoint"></a> [azure\_data\_storage\_account\_primary\_dfs\_endpoint](#output\_azure\_data\_storage\_account\_primary\_dfs\_endpoint) | Azure data storage account primary DFS endpoint |
 | <a name="output_azure_data_storage_container"></a> [azure\_data\_storage\_container](#output\_azure\_data\_storage\_container) | Azure data storage container name |
-| <a name="output_azure_data_storage_container_id"></a> [azure\_data\_storage\_container\_id](#output\_azure\_data\_storage\_container\_id) | Azure data storage container ID (null when reusing existing) |
+| <a name="output_azure_data_storage_container_id"></a> [azure\_data\_storage\_container\_id](#output\_azure\_data\_storage\_container\_id) | Azure data storage container ID |
 | <a name="output_azure_data_storage_location"></a> [azure\_data\_storage\_location](#output\_azure\_data\_storage\_location) | Azure data storage location (abfs:// URI) |
 | <a name="output_azure_log_storage_account"></a> [azure\_log\_storage\_account](#output\_azure\_log\_storage\_account) | Azure log storage account name |
 | <a name="output_azure_log_storage_account_id"></a> [azure\_log\_storage\_account\_id](#output\_azure\_log\_storage\_account\_id) | Azure log storage account ID |
 | <a name="output_azure_log_storage_account_primary_dfs_endpoint"></a> [azure\_log\_storage\_account\_primary\_dfs\_endpoint](#output\_azure\_log\_storage\_account\_primary\_dfs\_endpoint) | Azure log storage account primary DFS endpoint |
 | <a name="output_azure_log_storage_container"></a> [azure\_log\_storage\_container](#output\_azure\_log\_storage\_container) | Azure log storage container name |
-| <a name="output_azure_log_storage_container_id"></a> [azure\_log\_storage\_container\_id](#output\_azure\_log\_storage\_container\_id) | Azure log storage container ID (null when reusing existing) |
+| <a name="output_azure_log_storage_container_id"></a> [azure\_log\_storage\_container\_id](#output\_azure\_log\_storage\_container\_id) | Azure log storage container ID |
 | <a name="output_azure_log_storage_location"></a> [azure\_log\_storage\_location](#output\_azure\_log\_storage\_location) | Azure log storage location (abfs:// URI) |
-| <a name="output_storage_account_ids"></a> [storage\_account\_ids](#output\_storage\_account\_ids) | Map of created storage account names to their IDs |
+| <a name="output_storage_account_ids"></a> [storage\_account\_ids](#output\_storage\_account\_ids) | Map of storage account names to their IDs (created and pre-existing) |
 <!-- END_TF_DOCS -->

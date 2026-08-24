@@ -50,9 +50,9 @@ output "azure_data_storage_container_id" {
   value = (
     var.create_data_storage
     ? azurerm_storage_container.cdp_data_storage[0].id
-    : null
+    : data.azurerm_storage_container.existing_data_storage[0].id
   )
-  description = "Azure data storage container ID (null when reusing existing)"
+  description = "Azure data storage container ID"
 }
 
 # ------- Log Storage -------
@@ -93,9 +93,9 @@ output "azure_log_storage_container_id" {
   value = (
     var.create_log_storage
     ? azurerm_storage_container.cdp_log_storage[0].id
-    : null
+    : data.azurerm_storage_container.existing_log_storage[0].id
   )
-  description = "Azure log storage container ID (null when reusing existing)"
+  description = "Azure log storage container ID"
 }
 
 # ------- Backup Storage -------
@@ -136,13 +136,16 @@ output "azure_backup_storage_container_id" {
   value = (
     var.create_backup_storage
     ? azurerm_storage_container.cdp_backup_storage[0].id
-    : null
+    : data.azurerm_storage_container.existing_backup_storage[0].id
   )
-  description = "Azure backup storage container ID (null when reusing existing)"
+  description = "Azure backup storage container ID"
 }
 
 # ------- Aggregate Outputs -------
 output "storage_account_ids" {
-  value       = { for k, v in azurerm_storage_account.cdp_storage_locations : k => v.id }
-  description = "Map of created storage account names to their IDs"
+  value = merge(
+    { for k, v in azurerm_storage_account.cdp_storage_locations : k => v.id },
+    { for k, v in data.azurerm_storage_account.existing_storage : k => v.id }
+  )
+  description = "Map of storage account names to their IDs (created and pre-existing)"
 }
