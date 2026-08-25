@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2026 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +13,9 @@
 # limitations under the License.
 
 # ------- Existing VPC settings -------
-create_vpc              = false
-
-vpc_cidr = "10.10.0.0/16"
-
-# Can specify the pre-existing vpc and public & private Ids
-# In this example we take directly from the vpc.tf resources
-# cdp_vpc_id              = "<ENTER_VALUE>"
-# cdp_public_subnet_ids   = ["<ENTER_SUBNET_VALUE>", "<ENTER_SUBNET_VALUE>"]
-# cdp_private_subnet_ids  = ["<ENTER_SUBNET_VALUE>", "<ENTER_SUBNET_VALUE>"]
+cdp_vpc_id             = "<ENTER_VALUE>"
+cdp_public_subnet_ids  = ["<ENTER_SUBNET_VALUE>", "<ENTER_SUBNET_VALUE>"]
+cdp_private_subnet_ids = ["<ENTER_SUBNET_VALUE>", "<ENTER_SUBNET_VALUE>"]
 
 # ------- Global settings -------
 env_prefix = "<ENTER_VALUE>" # Required name prefix for cloud and CDP resources, e.g. cldr1

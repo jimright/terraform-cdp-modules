@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2026 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,18 +31,19 @@ variable "deployment_template" {
 }
 
 # ------- Network Resources -------
-variable "create_vpc" {
-  type = bool
-
-  description = "Flag to specify if the VPC should be created"
-
+variable "cdp_vpc_id" {
+  type        = string
+  description = "VPC ID for CDP environment."
 }
 
-variable "vpc_cidr" {
-  type = string
+variable "cdp_public_subnet_ids" {
+  type        = list(string)
+  description = "List of public subnet ids."
+}
 
-  description = "VPC CIDR used in vpc.tf"
-
+variable "cdp_private_subnet_ids" {
+  type        = list(string)
+  description = "List of private subnet ids."
 }
 
 variable "ingress_extra_cidrs_and_ports" {

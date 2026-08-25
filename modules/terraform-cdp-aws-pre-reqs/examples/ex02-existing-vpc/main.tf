@@ -1,4 +1,4 @@
-# Copyright 2023 Cloudera, Inc. All Rights Reserved.
+# Copyright 2026 Cloudera, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,18 +45,10 @@ module "ex02_existing_vpc" {
   log_data_access_policy_doc = base64decode(data.cdp_environments_aws_credential_prerequisites.cdp_prereqs.policies["Log_Policy"])
   ranger_audit_s3_policy_doc = base64decode(data.cdp_environments_aws_credential_prerequisites.cdp_prereqs.policies["Ranger_Audit"])
 
-  create_vpc             = var.create_vpc
-  cdp_vpc_id             = aws_vpc.cdp_vpc.id
-  cdp_public_subnet_ids  = values(aws_subnet.cdp_public_subnets)[*].id
-  cdp_private_subnet_ids = values(aws_subnet.cdp_private_subnets)[*].id
-
-  # Explicit dependency on resources in vpc.tf
-  depends_on = [
-    aws_internet_gateway.cdp_igw,
-    aws_default_route_table.cdp_public_route_table,
-    aws_nat_gateway.cdp_nat_gateway,
-    aws_route_table.cdp_private_route_table
-  ]
+  create_vpc             = false
+  cdp_vpc_id             = var.cdp_vpc_id
+  cdp_public_subnet_ids  = var.cdp_public_subnet_ids
+  cdp_private_subnet_ids = var.cdp_private_subnet_ids
 
 }
 
