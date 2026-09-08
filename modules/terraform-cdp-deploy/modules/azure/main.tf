@@ -82,6 +82,9 @@ resource "cdp_environments_azure_environment" "cdp_env" {
     multi_az                = var.multiaz
     instance_type           = var.freeipa_instance_type
     recipes                 = var.freeipa_recipes
+
+    image_id = var.freeipa_image_id
+    catalog  = var.freeipa_catalog
   }
 
   compute_cluster = {

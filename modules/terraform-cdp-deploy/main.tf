@@ -170,6 +170,8 @@ module "cdp_on_azure" {
 
   # Optional parameters defaulting to null
   environment_availability_zones = var.azure_environment_availability_zones
+  freeipa_catalog                = var.freeipa_catalog
+  freeipa_image_id               = var.freeipa_image_id
   freeipa_instance_type          = var.freeipa_instance_type
   freeipa_recipes                = var.freeipa_recipes
 
