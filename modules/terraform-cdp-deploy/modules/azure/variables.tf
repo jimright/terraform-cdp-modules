@@ -152,6 +152,20 @@ variable "freeipa_instance_type" {
 
 }
 
+variable "freeipa_catalog" {
+  type = string
+
+  description = "Image catalog to use for FreeIPA image selection"
+
+}
+
+variable "freeipa_image_id" {
+  type = string
+
+  description = "Image ID to use for creating FreeIPA instances"
+
+}
+
 variable "freeipa_recipes" {
   type = set(string)
 
